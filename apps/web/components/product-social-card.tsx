@@ -13,10 +13,14 @@ import {
   type ProductReaction,
 } from "@vendorly/utils";
 
+import { useCart } from "@/lib/cart";
+import { useStoreChat } from "@/lib/store-chat";
+
 type ProductSocialCardProps = {
   layout?: "grid" | "list";
   product: Product | MarketplaceProduct;
   storeName?: string;
+  storeSlug?: string;
   themeColor?: string;
   viewerId?: string | null;
 };
@@ -25,14 +29,21 @@ export function ProductSocialCard({
   layout = "list",
   product,
   storeName,
+  storeSlug,
   themeColor,
   viewerId,
 }: ProductSocialCardProps) {
+  const cart = useCart();
+  const storeChat = useStoreChat();
   const toggleReaction = useMutation(api.products.toggleProductReaction);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const totalReactions =
     product.reactionCount ?? getTotalReactionCount(product.reactionCounts);
+  const resolvedStoreName =
+    storeName ?? ("store" in product ? product.store?.name : undefined) ?? "Vendorly store";
+  const resolvedThemeColor =
+    themeColor ?? ("store" in product ? product.store?.themeColor : undefined);
 
   function handleReaction(reaction: ProductReaction) {
     if (!viewerId) {
@@ -60,10 +71,39 @@ export function ProductSocialCard({
   return (
     <div className="space-y-3">
       <ProductCard
+        footerContent={
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => cart.addItem(product, resolvedStoreName)}
+              className="inline-flex items-center border border-slate-950 bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+            >
+              Add to cart
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                storeChat.openChat({
+                  productId: product._id,
+                  productTitle: product.title,
+                  storeId: product.storeId,
+                  storeName: resolvedStoreName,
+                  storeSlug:
+                    storeSlug ??
+                    ("store" in product ? product.store?.slug : undefined),
+                  themeColor: resolvedThemeColor,
+                })
+              }
+              className="inline-flex items-center border border-black/10 bg-white px-4 py-2 text-sm font-medium text-slate-900 transition hover:border-slate-400"
+            >
+              Chat store
+            </button>
+          </div>
+        }
         layout={layout}
         product={product}
-        storeName={storeName}
-        themeColor={themeColor}
+        storeName={resolvedStoreName}
+        themeColor={resolvedThemeColor}
       />
       <div className="border border-black/10 bg-[rgba(255,253,247,0.9)] px-4 py-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">

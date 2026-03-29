@@ -1,7 +1,7 @@
 import { fetchQuery } from "convex/nextjs";
 
 import { api } from "@vendorly/convex";
-import type { Product, Store } from "@vendorly/utils";
+import type { ChatMessage, ChatThread, Product, Store } from "@vendorly/utils";
 
 import { DashboardShell } from "@/components/dashboard-shell";
 import { requireDashboardUser } from "@/lib/current-user";
@@ -28,6 +28,10 @@ export default async function DashboardPage({
     typeof resolvedSearchParams.store === "string"
       ? resolvedSearchParams.store
       : undefined;
+  const requestedChatViewerId =
+    typeof resolvedSearchParams.chat === "string"
+      ? resolvedSearchParams.chat
+      : undefined;
 
   const selectedStore =
     stores.find((store) => store._id === requestedStoreId) ?? stores[0];
@@ -40,12 +44,42 @@ export default async function DashboardPage({
         convexOptions,
       )
     : [];
+  const storeChatThreads = selectedStore
+    ? ((await fetchQuery(
+        api.chat.getOwnerStoreChatThreads,
+        {
+          ownerId: currentUser.id,
+          storeId: selectedStore._id,
+        },
+        convexOptions,
+      )) as ChatThread[])
+    : [];
+  const selectedChatViewerId = storeChatThreads.find(
+    (thread) => thread.viewerId === requestedChatViewerId,
+  )
+    ? requestedChatViewerId
+    : storeChatThreads[0]?.viewerId;
+  const selectedChatMessages =
+    selectedStore && selectedChatViewerId
+      ? ((await fetchQuery(
+          api.chat.getOwnerStoreChatMessages,
+          {
+            ownerId: currentUser.id,
+            storeId: selectedStore._id,
+            viewerId: selectedChatViewerId,
+          },
+          convexOptions,
+        )) as ChatMessage[])
+      : [];
 
   return (
     <DashboardShell
       currentUser={currentUser}
+      selectedChatMessages={selectedChatMessages}
+      selectedChatViewerId={selectedChatViewerId}
       selectedStoreId={selectedStore?._id}
       selectedStoreProducts={selectedStoreProducts as Product[]}
+      storeChatThreads={storeChatThreads}
       stores={stores}
     />
   );

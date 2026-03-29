@@ -1,5 +1,6 @@
 export type LayoutType = "grid" | "list";
 export type ProductReaction = "love" | "fire" | "wow";
+export type ChatSender = "buyer" | "seller";
 
 export interface VendorlyUser {
   _id: string;
@@ -49,6 +50,39 @@ export interface Product {
 
 export interface MarketplaceProduct extends Product {
   store?: Pick<Store, "_id" | "name" | "slug" | "themeColor">;
+}
+
+export interface CartItem {
+  image?: string;
+  price: number;
+  productId: string;
+  quantity: number;
+  storeId: string;
+  storeName?: string;
+  title: string;
+}
+
+export interface ChatMessage {
+  _id: string;
+  _creationTime?: number;
+  body: string;
+  productId?: string;
+  productTitle?: string;
+  senderType: ChatSender;
+  storeId: string;
+  viewerId: string;
+  viewerName?: string;
+}
+
+export interface ChatThread {
+  lastMessageAt?: number;
+  lastMessageBody?: string;
+  lastProductTitle?: string;
+  lastSenderType: ChatSender;
+  messageCount: number;
+  storeId: string;
+  viewerId: string;
+  viewerName?: string;
 }
 
 export interface StoreFormValues {

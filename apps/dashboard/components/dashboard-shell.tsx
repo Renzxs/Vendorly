@@ -19,6 +19,8 @@ import {
 import {
   DEFAULT_PRODUCT_FORM,
   DEFAULT_STORE_FORM,
+  type ChatMessage,
+  type ChatThread,
   getProductImages,
   getStoreSocialLinks,
   MARKETPLACE_URL,
@@ -37,6 +39,7 @@ import {
   saveStoreAction,
   generateProductImageUploadUrlAction,
   seedDemoDataAction,
+  sendSellerChatReplyAction,
   type DashboardActionResult,
 } from "@/app/dashboard/actions";
 import { signOutAction } from "@/lib/auth-actions";
@@ -55,8 +58,11 @@ type DashboardShellProps = {
     image?: string;
     name?: string;
   };
+  selectedChatMessages: ChatMessage[];
+  selectedChatViewerId?: string;
   selectedStoreId?: string;
   selectedStoreProducts: Product[];
+  storeChatThreads: ChatThread[];
   stores: Store[];
 };
 
@@ -64,6 +70,21 @@ type UploadedImagePreview = {
   previewUrl: string;
   storageId: string;
 };
+
+const chatTimestampFormatter = new Intl.DateTimeFormat("en-US", {
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+  month: "short",
+});
+
+function formatChatTimestamp(value?: number) {
+  if (!value) {
+    return "Just now";
+  }
+
+  return chatTimestampFormatter.format(value);
+}
 
 function Field({
   children,
@@ -178,8 +199,11 @@ function EmptyProductsState() {
 
 export function DashboardShell({
   currentUser,
+  selectedChatMessages,
+  selectedChatViewerId,
   selectedStoreId,
   selectedStoreProducts,
+  storeChatThreads,
   stores,
 }: DashboardShellProps) {
   const router = useRouter();
@@ -193,11 +217,18 @@ export function DashboardShell({
   const [status, setStatus] = useState<StatusState>(null);
   const [submittingStore, setSubmittingStore] = useState(false);
   const [submittingProduct, setSubmittingProduct] = useState(false);
+  const [submittingReply, setSubmittingReply] = useState(false);
+  const [sellerReply, setSellerReply] = useState("");
   const [uploadedImages, setUploadedImages] = useState<UploadedImagePreview[]>([]);
   const [uploadingImages, setUploadingImages] = useState(false);
   const selectedStore = useMemo(
     () => stores.find((store) => store._id === selectedStoreId),
     [selectedStoreId, stores],
+  );
+  const selectedChatThread = useMemo(
+    () =>
+      storeChatThreads.find((thread) => thread.viewerId === selectedChatViewerId),
+    [selectedChatViewerId, storeChatThreads],
   );
   const previewThemeColor = normalizeThemeColor(storeForm.themeColor);
   const previewSlug = slugify(storeForm.slug || storeForm.name);
@@ -285,6 +316,10 @@ export function DashboardShell({
     );
   }, [selectedProductId, selectedStoreProducts]);
 
+  useEffect(() => {
+    setSellerReply("");
+  }, [selectedChatViewerId]);
+
   function clearUploadedImages() {
     replaceUploadedImages([]);
   }
@@ -364,6 +399,30 @@ export function DashboardShell({
       nextSearchParams.set("store", storeId);
     } else {
       nextSearchParams.delete("store");
+    }
+
+    nextSearchParams.delete("chat");
+
+    const nextUrl = nextSearchParams.toString()
+      ? `${pathname}?${nextSearchParams.toString()}`
+      : pathname;
+
+    startNavigationTransition(() => {
+      router.replace(nextUrl);
+    });
+  }
+
+  function navigateToChat(viewerId?: string) {
+    const nextSearchParams = new URLSearchParams(searchParams.toString());
+
+    if (selectedStoreId) {
+      nextSearchParams.set("store", selectedStoreId);
+    }
+
+    if (viewerId) {
+      nextSearchParams.set("chat", viewerId);
+    } else {
+      nextSearchParams.delete("chat");
     }
 
     const nextUrl = nextSearchParams.toString()
@@ -464,6 +523,45 @@ export function DashboardShell({
       await applyActionResult(result);
     } finally {
       setSubmittingProduct(false);
+    }
+  }
+
+  async function handleSellerReplySubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!selectedStore) {
+      setStatus({
+        kind: "error",
+        message: "Choose a store before replying to chats.",
+      });
+      return;
+    }
+
+    if (!selectedChatViewerId) {
+      setStatus({
+        kind: "error",
+        message: "Select a conversation before replying.",
+      });
+      return;
+    }
+
+    setSubmittingReply(true);
+    setStatus(null);
+
+    try {
+      const result = await sendSellerChatReplyAction({
+        body: sellerReply,
+        storeId: selectedStore._id,
+        viewerId: selectedChatViewerId,
+      });
+
+      if (result.success) {
+        setSellerReply("");
+      }
+
+      await applyActionResult(result);
+    } finally {
+      setSubmittingReply(false);
     }
   }
 
@@ -1113,6 +1211,213 @@ export function DashboardShell({
                 ))
               ) : (
                 <EmptyProductsState />
+              )}
+            </div>
+          </div>
+
+          <div className="border border-black/10 bg-[rgba(255,253,247,0.92)] p-6">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+                  Customer inbox
+                </p>
+                <p className="mt-2 text-sm text-slate-600">
+                  {selectedStore
+                    ? `Buyer conversations for ${selectedStore.name}`
+                    : "Choose a store to view customer chats"}
+                </p>
+              </div>
+              {selectedStore ? (
+                <span className="border border-black/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+                  {storeChatThreads.length} thread
+                  {storeChatThreads.length === 1 ? "" : "s"}
+                </span>
+              ) : null}
+            </div>
+
+            <div className="mt-6">
+              {!selectedStore ? (
+                <div className="border border-dashed border-slate-400 bg-[rgba(255,253,247,0.88)] p-6 text-center">
+                  <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+                    No store selected
+                  </h3>
+                  <p className="mt-3 text-sm leading-8 text-slate-600">
+                    Pick a store from the left to see customer questions and reply as the seller.
+                  </p>
+                </div>
+              ) : storeChatThreads.length === 0 ? (
+                <div className="border border-dashed border-slate-400 bg-[rgba(255,253,247,0.88)] p-6 text-center">
+                  <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+                    No chats yet
+                  </h3>
+                  <p className="mt-3 text-sm leading-8 text-slate-600">
+                    Buyer messages from product cards or the storefront will appear here.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid gap-6 xl:grid-cols-[260px_minmax(0,1fr)]">
+                  <div className="space-y-3">
+                    {storeChatThreads.map((thread) => {
+                      const active = thread.viewerId === selectedChatViewerId;
+
+                      return (
+                        <button
+                          key={thread.viewerId}
+                          type="button"
+                          onClick={() => navigateToChat(thread.viewerId)}
+                          className={`w-full border p-4 text-left transition ${
+                            active
+                              ? "border-slate-950 bg-slate-950 text-white"
+                              : "border-black/10 bg-white hover:border-slate-400"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-sm font-semibold">
+                                {thread.viewerName || `Guest ${thread.viewerId.slice(0, 4)}`}
+                              </p>
+                              <p
+                                className={`mt-1 text-xs uppercase tracking-[0.2em] ${
+                                  active ? "text-white/60" : "text-slate-400"
+                                }`}
+                              >
+                                {thread.messageCount} message
+                                {thread.messageCount === 1 ? "" : "s"}
+                              </p>
+                            </div>
+                            <span
+                              className={`text-[0.68rem] ${
+                                active ? "text-white/65" : "text-slate-400"
+                              }`}
+                            >
+                              {formatChatTimestamp(thread.lastMessageAt)}
+                            </span>
+                          </div>
+                          {thread.lastProductTitle ? (
+                            <p
+                              className={`mt-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em] ${
+                                active ? "text-white/65" : "text-slate-400"
+                              }`}
+                            >
+                              {thread.lastProductTitle}
+                            </p>
+                          ) : null}
+                          <p
+                            className={`mt-2 text-sm leading-7 ${
+                              active ? "text-white/80" : "text-slate-600"
+                            }`}
+                          >
+                            {thread.lastMessageBody}
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="border border-black/10 bg-white">
+                    <div className="border-b border-black/10 px-5 py-4">
+                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+                        Active conversation
+                      </p>
+                      <h3 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
+                        {selectedChatThread?.viewerName ||
+                          (selectedChatViewerId
+                            ? `Guest ${selectedChatViewerId.slice(0, 4)}`
+                            : "Select a conversation")}
+                      </h3>
+                      <p className="mt-2 text-sm text-slate-600">
+                        Reply from your seller dashboard. New buyer messages appear here after refresh and update live on the buyer side.
+                      </p>
+                    </div>
+
+                    {selectedChatMessages.length > 0 ? (
+                      <div className="max-h-[28rem] space-y-4 overflow-y-auto px-5 py-5">
+                        {selectedChatMessages.map((message) => (
+                          <div
+                            key={message._id}
+                            className={`max-w-[88%] border px-4 py-3 text-sm leading-7 ${
+                              message.senderType === "seller"
+                                ? "ml-auto border-slate-950 bg-slate-950 text-white"
+                                : "border-black/10 bg-[rgba(255,253,247,0.88)] text-slate-700"
+                            }`}
+                          >
+                            <div className="mb-2 flex items-center justify-between gap-4 text-[0.68rem] font-semibold uppercase tracking-[0.22em]">
+                              <span
+                                className={
+                                  message.senderType === "seller"
+                                    ? "text-white/65"
+                                    : "text-slate-400"
+                                }
+                              >
+                                {message.senderType === "seller"
+                                  ? "Seller"
+                                  : message.viewerName ||
+                                    `Guest ${message.viewerId.slice(0, 4)}`}
+                              </span>
+                              <span
+                                className={
+                                  message.senderType === "seller"
+                                    ? "text-white/65"
+                                    : "text-slate-400"
+                                }
+                              >
+                                {formatChatTimestamp(message._creationTime)}
+                              </span>
+                            </div>
+                            {message.productTitle ? (
+                              <p
+                                className={`mb-2 text-[0.68rem] font-semibold uppercase tracking-[0.24em] ${
+                                  message.senderType === "seller"
+                                    ? "text-white/65"
+                                    : "text-slate-400"
+                                }`}
+                              >
+                                {message.productTitle}
+                              </p>
+                            ) : null}
+                            <p>{message.body}</p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="px-5 py-6">
+                        <div className="border border-dashed border-slate-400 bg-[rgba(255,253,247,0.88)] p-6 text-center">
+                          <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+                            Select a chat
+                          </h3>
+                          <p className="mt-3 text-sm leading-8 text-slate-600">
+                            Choose a conversation to read the thread and reply from here.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    <form
+                      onSubmit={handleSellerReplySubmit}
+                      className="border-t border-black/10 px-5 py-5"
+                    >
+                      <Field label="Reply as seller">
+                        <Textarea
+                          onChange={(event) => setSellerReply(event.target.value)}
+                          placeholder="Answer questions about product details, shipping, or customization."
+                          value={sellerReply}
+                        />
+                      </Field>
+                      <button
+                        type="submit"
+                        disabled={
+                          submittingReply ||
+                          !selectedStore ||
+                          !selectedChatViewerId ||
+                          !sellerReply.trim()
+                        }
+                        className="mt-4 inline-flex w-full justify-center border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {submittingReply ? "Sending..." : "Send reply"}
+                      </button>
+                    </form>
+                  </div>
+                </div>
               )}
             </div>
           </div>

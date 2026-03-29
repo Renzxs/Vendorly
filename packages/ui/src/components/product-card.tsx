@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 
 import type { LayoutType, MarketplaceProduct, Product } from "@vendorly/utils";
@@ -9,6 +10,8 @@ import { ThemeWrapper } from "./theme-wrapper";
 
 type ProductCardProps = {
   className?: string;
+  footerContent?: ReactNode;
+  footerLabel?: string;
   layout?: LayoutType;
   product: Product | MarketplaceProduct;
   storeName?: string;
@@ -17,6 +20,8 @@ type ProductCardProps = {
 
 export function ProductCard({
   className,
+  footerContent,
+  footerLabel = "Storefront-ready catalog item",
   layout = "grid",
   product,
   storeName,
@@ -124,14 +129,9 @@ export function ProductCard({
         </div>
         <div className="flex items-center justify-between gap-4 border-t border-black/10 pt-4">
           <span className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-500">
-            Storefront-ready catalog item
+            {footerLabel}
           </span>
-          <button
-            type="button"
-            className="inline-flex items-center border border-slate-950 bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
-          >
-            Add to cart
-          </button>
+          {footerContent ?? null}
         </div>
       </div>
     </ThemeWrapper>

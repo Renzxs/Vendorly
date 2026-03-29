@@ -49,6 +49,12 @@ type SaveProductInput = {
   title: string;
 };
 
+type SendSellerChatReplyInput = {
+  body: string;
+  storeId: string;
+  viewerId: string;
+};
+
 function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Something went wrong.";
 }
@@ -220,6 +226,60 @@ export async function seedDemoDataAction(): Promise<DashboardActionResult> {
     return {
       success: true,
       message: result.message,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: getErrorMessage(error),
+    };
+  }
+}
+
+export async function sendSellerChatReplyAction(
+  input: SendSellerChatReplyInput,
+): Promise<DashboardActionResult> {
+  try {
+    const currentUser = await requireDashboardUser();
+    const convexOptions = getConvexServerOptions();
+
+    if (!input.storeId) {
+      return {
+        success: false,
+        message: "Choose a store before replying to chats.",
+      };
+    }
+
+    if (!input.viewerId) {
+      return {
+        success: false,
+        message: "Select a conversation before replying.",
+      };
+    }
+
+    if (!input.body.trim()) {
+      return {
+        success: false,
+        message: "Reply cannot be empty.",
+      };
+    }
+
+    await fetchMutation(
+      api.chat.sendSellerStoreMessage,
+      {
+        body: input.body.trim(),
+        ownerId: currentUser.id,
+        storeId: input.storeId,
+        viewerId: input.viewerId,
+      },
+      convexOptions,
+    );
+
+    revalidatePath("/dashboard");
+
+    return {
+      success: true,
+      message: "Reply sent.",
+      storeId: input.storeId,
     };
   } catch (error) {
     return {

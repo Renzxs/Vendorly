@@ -8,6 +8,7 @@ import { api } from "@vendorly/convex";
 import { StoreBanner, ThemeWrapper } from "@vendorly/ui";
 import { getInitials, getStoreSocialLinks, type Product, type Store } from "@vendorly/utils";
 
+import { useStoreChat } from "@/lib/store-chat";
 import { useViewerId } from "@/lib/use-viewer-id";
 import { ProductSocialCard } from "./product-social-card";
 
@@ -28,12 +29,14 @@ function StoreProducts({
   layoutType,
   storeId,
   storeName,
+  storeSlug,
   themeColor,
   viewerId,
 }: {
   layoutType: "grid" | "list";
   storeId: string;
   storeName: string;
+  storeSlug: string;
   themeColor: string;
   viewerId?: string | null;
 }) {
@@ -73,6 +76,7 @@ function StoreProducts({
           layout={layoutType}
           product={product}
           storeName={storeName}
+          storeSlug={storeSlug}
           themeColor={themeColor}
           viewerId={viewerId}
         />
@@ -82,6 +86,7 @@ function StoreProducts({
 }
 
 export function StorefrontShell({ slug }: { slug: string }) {
+  const storeChat = useStoreChat();
   const viewerId = useViewerId();
   const store = useQuery(api.stores.getStoreBySlug, {
     slug,
@@ -194,6 +199,7 @@ export function StorefrontShell({ slug }: { slug: string }) {
               layoutType={store.layoutType}
               storeId={store._id}
               storeName={store.name}
+              storeSlug={store.slug}
               themeColor={store.themeColor}
               viewerId={viewerId}
             />
@@ -260,18 +266,34 @@ export function StorefrontShell({ slug }: { slug: string }) {
                 Follows now persist to Convex for this browser session, and your
                 product feed can prioritize stores you follow.
               </p>
-              <button
-                type="button"
-                disabled={isPending || !viewerId}
-                onClick={handleToggleFollow}
-                className={`mt-6 inline-flex w-full justify-center border px-5 py-3 text-sm font-medium transition ${
-                  store.isFollowed
-                    ? "border-slate-950 bg-slate-950 text-white"
-                    : "border-black/10 bg-white text-slate-900 hover:border-slate-400"
-                } ${isPending || !viewerId ? "cursor-not-allowed opacity-60" : ""}`}
-              >
-                {store.isFollowed ? "Following store" : "Follow store"}
-              </button>
+              <div className="mt-6 grid gap-3">
+                <button
+                  type="button"
+                  onClick={() =>
+                    storeChat.openChat({
+                      storeId: store._id,
+                      storeName: store.name,
+                      storeSlug: store.slug,
+                      themeColor: store.themeColor,
+                    })
+                  }
+                  className="inline-flex w-full justify-center border border-black/10 bg-white px-5 py-3 text-sm font-medium text-slate-900 transition hover:border-slate-400"
+                >
+                  Chat with store
+                </button>
+                <button
+                  type="button"
+                  disabled={isPending || !viewerId}
+                  onClick={handleToggleFollow}
+                  className={`inline-flex w-full justify-center border px-5 py-3 text-sm font-medium transition ${
+                    store.isFollowed
+                      ? "border-slate-950 bg-slate-950 text-white"
+                      : "border-black/10 bg-white text-slate-900 hover:border-slate-400"
+                  } ${isPending || !viewerId ? "cursor-not-allowed opacity-60" : ""}`}
+                >
+                  {store.isFollowed ? "Following store" : "Follow store"}
+                </button>
+              </div>
               {followError ? (
                 <p className="mt-3 text-sm text-rose-600">{followError}</p>
               ) : null}

@@ -51,4 +51,16 @@ export default defineSchema({
     .index("by_product", ["productId"])
     .index("by_viewer", ["viewerId"])
     .index("by_product_viewer", ["productId", "viewerId"]),
+  chatMessages: defineTable({
+    body: v.string(),
+    productId: v.optional(v.id("products")),
+    productTitle: v.optional(v.string()),
+    senderType: v.union(v.literal("buyer"), v.literal("seller")),
+    storeId: v.id("stores"),
+    viewerId: v.string(),
+    viewerName: v.optional(v.string()),
+  })
+    .index("by_store", ["storeId"])
+    .index("by_viewer", ["viewerId"])
+    .index("by_store_viewer", ["storeId", "viewerId"]),
 });

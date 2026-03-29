@@ -6,11 +6,25 @@ import {
   signInWithGoogleAction,
 } from "@/lib/auth-actions";
 
-export default async function LoginPage() {
+type LoginPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+function getCallbackUrl(value: string | string[] | undefined) {
+  if (typeof value !== "string" || value.length === 0) {
+    return "/dashboard";
+  }
+
+  return value;
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
   const session = await auth();
+  const resolvedSearchParams = await searchParams;
+  const callbackUrl = getCallbackUrl(resolvedSearchParams.callbackUrl);
 
   if (session?.user?.id) {
-    redirect("/dashboard");
+    redirect(callbackUrl);
   }
 
   const hasAnyProvider =
@@ -39,6 +53,7 @@ export default async function LoginPage() {
           <div className="mt-6 grid gap-3">
             {authProviderAvailability.google ? (
               <form action={signInWithGoogleAction}>
+                <input type="hidden" name="callbackUrl" value={callbackUrl} />
                 <button
                   type="submit"
                   className="inline-flex w-full justify-center border border-white bg-white px-5 py-3 text-sm font-medium text-slate-950 transition hover:bg-slate-100"
@@ -50,6 +65,7 @@ export default async function LoginPage() {
 
             {authProviderAvailability.github ? (
               <form action={signInWithGitHubAction}>
+                <input type="hidden" name="callbackUrl" value={callbackUrl} />
                 <button
                   type="submit"
                   className="inline-flex w-full justify-center border border-white/15 bg-white/10 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/15"
