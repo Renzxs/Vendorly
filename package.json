@@ -1,0 +1,28 @@
+{
+  "name": "vendorly",
+  "private": true,
+  "packageManager": "npm@10.9.0",
+  "engines": {
+    "node": ">=20.12.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel --filter=@vendorly/web --filter=@vendorly/dashboard",
+    "dev:web": "npm --workspace @vendorly/web run dev",
+    "dev:dashboard": "npm --workspace @vendorly/dashboard run dev",
+    "dev:convex": "convex dev",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.5.14",
+    "prettier": "^3.5.3",
+    "turbo": "^2.5.0",
+    "typescript": "^5.8.0"
+  }
+}
