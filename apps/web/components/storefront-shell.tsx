@@ -6,7 +6,12 @@ import Link from "next/link";
 
 import { api } from "@vendorly/convex";
 import { StoreBanner, ThemeWrapper } from "@vendorly/ui";
-import { getInitials, getStoreSocialLinks, type Product, type Store } from "@vendorly/utils";
+import {
+  getInitials,
+  getStoreSocialLinks,
+  type Product,
+  type Store,
+} from "@vendorly/utils";
 
 import { useStoreChat } from "@/lib/store-chat";
 import { useViewerId } from "@/lib/use-viewer-id";
@@ -14,11 +19,11 @@ import { ProductSocialCard } from "./product-social-card";
 
 function StorefrontLoading() {
   return (
-    <div className="space-y-4">
+    <div className="grid gap-6">
       {Array.from({ length: 3 }).map((_, index) => (
         <div
           key={index}
-          className="h-52 animate-pulse border border-black/10 bg-[rgba(255,253,247,0.86)]"
+          className="h-56 animate-pulse rounded-3xl border border-slate-200 bg-white"
         />
       ))}
     </div>
@@ -51,11 +56,11 @@ function StoreProducts({
 
   if (products.length === 0) {
     return (
-      <div className="border border-dashed border-slate-400 bg-[rgba(255,253,247,0.88)] p-10 text-center">
+      <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
         <h2 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
           This storefront is ready for its first drop.
         </h2>
-        <p className="mt-4 text-sm leading-8 text-slate-600">
+        <p className="mt-4 text-sm leading-7 text-slate-600">
           Products added in the Vendorly dashboard will show up here instantly.
         </p>
       </div>
@@ -63,24 +68,45 @@ function StoreProducts({
   }
 
   return (
-    <div
-      className={
-        layoutType === "grid"
-          ? "grid gap-5 lg:grid-cols-2"
-          : "space-y-5"
-      }
-    >
-      {products.map((product) => (
-        <ProductSocialCard
-          key={product._id}
-          layout={layoutType}
-          product={product}
-          storeName={storeName}
-          storeSlug={storeSlug}
-          themeColor={themeColor}
-          viewerId={viewerId}
-        />
-      ))}
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+            Product catalog
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+            Shop {storeName}
+          </h2>
+        </div>
+        <div className="flex flex-wrap gap-3 text-sm text-slate-600">
+          <span className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2">
+            {products.length} item{products.length === 1 ? "" : "s"}
+          </span>
+          <span className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 capitalize">
+            {layoutType} layout
+          </span>
+        </div>
+      </div>
+
+      <div
+        className={
+          layoutType === "grid"
+            ? "grid gap-6 sm:grid-cols-2 xl:grid-cols-2"
+            : "space-y-4"
+        }
+      >
+        {products.map((product) => (
+          <ProductSocialCard
+            key={product._id}
+            layout={layoutType}
+            product={product}
+            storeName={storeName}
+            storeSlug={storeSlug}
+            themeColor={themeColor}
+            viewerId={viewerId}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -101,7 +127,7 @@ export function StorefrontShell({ slug }: { slug: string }) {
 
   if (store === undefined) {
     return (
-      <main className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-[88rem] px-4 py-8 sm:px-6 lg:px-8">
         <StorefrontLoading />
       </main>
     );
@@ -110,19 +136,19 @@ export function StorefrontShell({ slug }: { slug: string }) {
   if (store === null) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6 lg:px-8">
-        <div className="border border-dashed border-slate-400 bg-[rgba(255,253,247,0.9)] p-10">
-          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.32em] text-slate-500">
+        <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
             Store not found
           </p>
           <h1 className="mt-4 font-[family-name:var(--font-display)] text-5xl leading-none tracking-tight text-slate-950">
             This Vendorly storefront doesn&apos;t exist yet.
           </h1>
-          <p className="mt-4 text-sm leading-8 text-slate-600">
+          <p className="mt-4 text-sm leading-7 text-slate-600">
             Double-check the URL or create the store from the seller dashboard.
           </p>
           <Link
             href="/"
-            className="mt-6 inline-flex border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
+            className="mt-6 inline-flex rounded-xl border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
           >
             Back to marketplace
           </Link>
@@ -147,7 +173,9 @@ export function StorefrontShell({ slug }: { slug: string }) {
         });
       } catch (error) {
         setFollowError(
-          error instanceof Error ? error.message : "Unable to update follow state.",
+          error instanceof Error
+            ? error.message
+            : "Unable to update follow state.",
         );
       }
     });
@@ -155,22 +183,47 @@ export function StorefrontShell({ slug }: { slug: string }) {
 
   return (
     <ThemeWrapper themeColor={store.themeColor}>
-      <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-black/10 pb-5">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 border-b border-slate-900 pb-1 text-sm font-medium text-slate-700 transition hover:text-slate-950"
-          >
-            Back to marketplace
-          </Link>
-          <div className="flex flex-wrap gap-3">
-            <span className="border border-black/10 bg-[rgba(255,253,247,0.88)] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-slate-500">
-              {store.layoutType} layout
-            </span>
-            <span className="border border-black/10 bg-[rgba(255,253,247,0.88)] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-slate-500">
+      <main className="mx-auto max-w-[88rem] px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/"
+              className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:text-slate-950"
+            >
+              Back to marketplace
+            </Link>
+            <span className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 shadow-sm">
               {store.followerCount ?? 0} follower
               {(store.followerCount ?? 0) === 1 ? "" : "s"}
             </span>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() =>
+                storeChat.openChat({
+                  storeId: store._id,
+                  storeName: store.name,
+                  storeSlug: store.slug,
+                  themeColor: store.themeColor,
+                })
+              }
+              className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-slate-300"
+            >
+              Chat with store
+            </button>
+            <button
+              type="button"
+              disabled={isPending || !viewerId}
+              onClick={handleToggleFollow}
+              className={`inline-flex items-center rounded-xl border px-4 py-2.5 text-sm font-medium shadow-sm transition ${
+                store.isFollowed
+                  ? "border-slate-950 bg-slate-950 text-white"
+                  : "border-slate-200 bg-white text-slate-900 hover:border-slate-300"
+              } ${isPending || !viewerId ? "cursor-not-allowed opacity-60" : ""}`}
+            >
+              {store.isFollowed ? "Following" : "Follow store"}
+            </button>
           </div>
         </div>
 
@@ -182,19 +235,21 @@ export function StorefrontShell({ slug }: { slug: string }) {
           themeColor={store.themeColor}
         />
 
-        <section className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <section className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-6">
-            <div className="border-b border-black/10 pb-5">
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.32em] text-slate-500">
-                Storefront catalog
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
+                Storefront overview
               </p>
-              <h2 className="mt-3 font-[family-name:var(--font-display)] text-5xl leading-none tracking-tight text-slate-950">
-                Browse the current collection.
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+                Browse the current collection
               </h2>
-              <p className="mt-4 max-w-2xl text-sm leading-8 text-slate-600">
-                This page renders live from the seller&apos;s current storefront configuration, follow state, and product reactions.
+              <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+                This page stays in sync with the seller&apos;s live storefront,
+                product catalog, follow state, and buyer-to-seller chat.
               </p>
             </div>
+
             <StoreProducts
               layoutType={store.layoutType}
               storeId={store._id}
@@ -205,36 +260,36 @@ export function StorefrontShell({ slug }: { slug: string }) {
             />
           </div>
 
-          <aside className="space-y-6">
-            <div className="border border-black/10 bg-[rgba(255,253,247,0.92)] p-6">
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-slate-500">
+          <aside className="space-y-6 lg:sticky lg:top-24 lg:h-fit">
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
                 About this store
               </p>
               <div className="mt-5 flex items-start gap-4">
                 {store.logoImage ? (
                   <img
                     alt={`${store.name} logo`}
-                    className="h-20 w-20 border border-black/10 object-cover"
+                    className="h-16 w-16 rounded-2xl border border-slate-200 object-cover"
                     src={store.logoImage}
                   />
                 ) : (
                   <div
-                    className="inline-flex h-20 w-20 items-center justify-center border border-black/10 text-lg font-semibold text-white"
+                    className="inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-200 text-sm font-semibold text-white"
                     style={{ backgroundColor: store.themeColor }}
                   >
                     {getInitials(store.name)}
                   </div>
                 )}
                 <div>
-                  <h2 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+                  <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
                     {store.name}
                   </h2>
-                  <p className="mt-3 text-sm leading-7 text-slate-600">
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
                     {store.description}
                   </p>
                 </div>
               </div>
-              <p className="mt-5 text-sm leading-8 text-slate-600">
+              <p className="mt-5 text-sm leading-7 text-slate-600">
                 {store.bio ||
                   "This seller has not added a longer brand bio yet. Their short storefront description appears above."}
               </p>
@@ -246,7 +301,7 @@ export function StorefrontShell({ slug }: { slug: string }) {
                       href={link.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="border border-black/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 transition hover:border-slate-400 hover:text-slate-950"
+                      className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 transition hover:border-slate-300 hover:bg-white hover:text-slate-950"
                     >
                       {link.label}
                     </a>
@@ -255,18 +310,11 @@ export function StorefrontShell({ slug }: { slug: string }) {
               ) : null}
             </div>
 
-            <div className="border border-black/10 bg-[rgba(255,253,247,0.92)] p-6">
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-slate-500">
-                Store actions
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+                Shopper actions
               </p>
-              <h2 className="mt-4 font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
-                Follow and revisit this storefront later.
-              </h2>
-              <p className="mt-4 text-sm leading-8 text-slate-600">
-                Follows now persist to Convex for this browser session, and your
-                product feed can prioritize stores you follow.
-              </p>
-              <div className="mt-6 grid gap-3">
+              <div className="mt-5 grid gap-3">
                 <button
                   type="button"
                   onClick={() =>
@@ -277,18 +325,18 @@ export function StorefrontShell({ slug }: { slug: string }) {
                       themeColor: store.themeColor,
                     })
                   }
-                  className="inline-flex w-full justify-center border border-black/10 bg-white px-5 py-3 text-sm font-medium text-slate-900 transition hover:border-slate-400"
+                  className="inline-flex w-full justify-center rounded-xl border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
                 >
-                  Chat with store
+                  Ask a question
                 </button>
                 <button
                   type="button"
                   disabled={isPending || !viewerId}
                   onClick={handleToggleFollow}
-                  className={`inline-flex w-full justify-center border px-5 py-3 text-sm font-medium transition ${
+                  className={`inline-flex w-full justify-center rounded-xl border px-5 py-3 text-sm font-medium transition ${
                     store.isFollowed
                       ? "border-slate-950 bg-slate-950 text-white"
-                      : "border-black/10 bg-white text-slate-900 hover:border-slate-400"
+                      : "border-slate-200 bg-slate-50 text-slate-900 hover:border-slate-300 hover:bg-white"
                   } ${isPending || !viewerId ? "cursor-not-allowed opacity-60" : ""}`}
                 >
                   {store.isFollowed ? "Following store" : "Follow store"}
@@ -299,16 +347,20 @@ export function StorefrontShell({ slug }: { slug: string }) {
               ) : null}
             </div>
 
-            <div className="border border-black/10 bg-slate-950 p-6 text-white">
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-white/55">
-                Build your own
+            <div className="rounded-[2rem] border border-slate-200 bg-slate-950 p-6 text-white shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/55">
+                Seller tools
               </p>
-              <h2 className="mt-4 font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight">
-                Open the Vendorly dashboard and launch your branded storefront.
+              <h2 className="mt-4 text-2xl font-semibold tracking-tight">
+                Launch your own storefront
               </h2>
+              <p className="mt-3 text-sm leading-7 text-white/72">
+                Open the Vendorly dashboard to create a catalog, upload product
+                images, and manage customer conversations.
+              </p>
               <a
                 href={dashboardUrl}
-                className="mt-6 inline-flex border border-white bg-white px-5 py-3 text-sm font-medium text-slate-950"
+                className="mt-6 inline-flex rounded-xl border border-white bg-white px-5 py-3 text-sm font-medium text-slate-950"
               >
                 Go to dashboard
               </a>

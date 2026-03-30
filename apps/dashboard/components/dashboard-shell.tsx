@@ -19,6 +19,7 @@ import {
 import {
   DEFAULT_PRODUCT_FORM,
   DEFAULT_STORE_FORM,
+  cn,
   type ChatMessage,
   type ChatThread,
   getProductImages,
@@ -44,12 +45,10 @@ import {
 } from "@/app/dashboard/actions";
 import { signOutAction } from "@/lib/auth-actions";
 
-type StatusState =
-  | {
-      kind: "error" | "success";
-      message: string;
-    }
-  | null;
+type StatusState = {
+  kind: "error" | "success";
+  message: string;
+} | null;
 
 type DashboardShellProps = {
   currentUser: {
@@ -86,16 +85,10 @@ function formatChatTimestamp(value?: number) {
   return chatTimestampFormatter.format(value);
 }
 
-function Field({
-  children,
-  label,
-}: {
-  children: ReactNode;
-  label: string;
-}) {
+function Field({ children, label }: { children: ReactNode; label: string }) {
   return (
     <label className="block space-y-2">
-      <span className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+      <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
         {label}
       </span>
       {children}
@@ -107,7 +100,7 @@ function TextInput(props: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className="w-full border border-black/10 bg-[rgba(255,253,247,0.96)] px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-400"
+      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-300 focus:bg-white"
     />
   );
 }
@@ -116,7 +109,7 @@ function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
       {...props}
-      className="min-h-28 w-full border border-black/10 bg-[rgba(255,253,247,0.96)] px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-400"
+      className="min-h-28 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-300 focus:bg-white"
     />
   );
 }
@@ -134,23 +127,23 @@ function StoreListCard({
     <button
       type="button"
       onClick={onClick}
-      className={`w-full border p-4 text-left transition ${
+      className={`w-full rounded-2xl border p-4 text-left transition ${
         active
-          ? "border-slate-950 bg-[#111c18] text-white"
-          : "border-black/10 bg-[rgba(255,253,247,0.92)] hover:border-slate-400 hover:bg-white/70"
+          ? "border-slate-950 bg-slate-950 text-white shadow-sm"
+          : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
       }`}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div className="space-y-2">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
           {store.logoImage ? (
             <img
               alt={`${store.name} logo`}
-              className="h-12 w-12 border border-white/10 object-cover"
+              className="h-12 w-12 rounded-xl border border-white/10 object-cover"
               src={store.logoImage}
             />
           ) : (
             <div
-              className={`inline-flex h-11 w-11 items-center justify-center border text-sm font-semibold ${
+              className={`inline-flex h-11 w-11 items-center justify-center rounded-xl border text-sm font-semibold ${
                 active ? "bg-white/15 text-white" : "text-white"
               }`}
               style={active ? undefined : { backgroundColor: store.themeColor }}
@@ -158,41 +151,104 @@ function StoreListCard({
               {getInitials(store.name)}
             </div>
           )}
-          <div>
-            <p className="text-lg font-semibold tracking-tight">{store.name}</p>
-            <p
-              className={`text-sm leading-6 ${
-                active ? "text-white/70" : "text-slate-600"
-              }`}
-            >
-              {store.description}
-            </p>
-          </div>
+          <p className="min-w-0 text-lg font-semibold tracking-tight [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">
+            {store.name}
+          </p>
         </div>
         <span
-          className={`px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] ${
+          className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] ${
             active
               ? "border border-white/15 bg-white/10 text-white/75"
-              : "border border-black/10 text-slate-500"
+              : "border border-slate-200 bg-slate-50 text-slate-500"
           }`}
         >
           {store.layoutType}
         </span>
       </div>
+      <p
+        className={`mt-4 text-sm leading-6 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden ${
+          active ? "text-white/70" : "text-slate-600"
+        }`}
+      >
+        {store.description}
+      </p>
     </button>
   );
 }
 
 function EmptyProductsState() {
   return (
-    <div className="border border-dashed border-slate-400 bg-[rgba(255,253,247,0.9)] p-6 text-center">
+    <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
       <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
         No products yet
       </h3>
-      <p className="mt-3 text-sm leading-8 text-slate-600">
+      <p className="mt-3 text-sm leading-7 text-slate-600">
         Add your first product and it will appear on this storefront
         immediately.
       </p>
+    </div>
+  );
+}
+
+function Panel({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <section
+      className={cn(
+        "rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8",
+        className,
+      )}
+    >
+      {children}
+    </section>
+  );
+}
+
+function PanelHeader({
+  action,
+  description,
+  eyebrow,
+  title,
+}: {
+  action?: ReactNode;
+  description?: string;
+  eyebrow: string;
+  title: string;
+}) {
+  return (
+    <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
+          {eyebrow}
+        </p>
+        <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+          {title}
+        </h2>
+        {description ? (
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+            {description}
+          </p>
+        ) : null}
+      </div>
+      {action}
+    </div>
+  );
+}
+
+function MetricCard({ label, value }: { label: string; value: ReactNode }) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+        {label}
+      </p>
+      <div className="mt-3 break-words text-3xl font-semibold tracking-tight text-slate-950">
+        {value}
+      </div>
     </div>
   );
 }
@@ -210,16 +266,21 @@ export function DashboardShell({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isNavigatingStore, startNavigationTransition] = useTransition();
-  const [storeForm, setStoreForm] = useState<StoreFormValues>(DEFAULT_STORE_FORM);
+  const [storeForm, setStoreForm] =
+    useState<StoreFormValues>(DEFAULT_STORE_FORM);
   const [productForm, setProductForm] =
     useState<ProductFormValues>(DEFAULT_PRODUCT_FORM);
-  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(
+    null,
+  );
   const [status, setStatus] = useState<StatusState>(null);
   const [submittingStore, setSubmittingStore] = useState(false);
   const [submittingProduct, setSubmittingProduct] = useState(false);
   const [submittingReply, setSubmittingReply] = useState(false);
   const [sellerReply, setSellerReply] = useState("");
-  const [uploadedImages, setUploadedImages] = useState<UploadedImagePreview[]>([]);
+  const [uploadedImages, setUploadedImages] = useState<UploadedImagePreview[]>(
+    [],
+  );
   const [uploadingImages, setUploadingImages] = useState(false);
   const selectedStore = useMemo(
     () => stores.find((store) => store._id === selectedStoreId),
@@ -227,7 +288,9 @@ export function DashboardShell({
   );
   const selectedChatThread = useMemo(
     () =>
-      storeChatThreads.find((thread) => thread.viewerId === selectedChatViewerId),
+      storeChatThreads.find(
+        (thread) => thread.viewerId === selectedChatViewerId,
+      ),
     [selectedChatViewerId, storeChatThreads],
   );
   const previewThemeColor = normalizeThemeColor(storeForm.themeColor);
@@ -383,7 +446,10 @@ export function DashboardShell({
   function removeUploadedImage(storageId: string) {
     setUploadedImages((current) =>
       current.filter((image) => {
-        if (image.storageId === storageId && image.previewUrl.startsWith("blob:")) {
+        if (
+          image.storageId === storageId &&
+          image.previewUrl.startsWith("blob:")
+        ) {
           URL.revokeObjectURL(image.previewUrl);
         }
 
@@ -566,67 +632,56 @@ export function DashboardShell({
   }
 
   return (
-    <main className="mx-auto max-w-[92rem] px-4 py-10 sm:px-6 lg:px-8">
-      <section className="border border-black/10 bg-[rgba(255,253,247,0.92)] p-6 sm:p-8">
-        <div className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
-          <div className="space-y-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-teal-700">
-              Vendorly seller control center
-            </p>
-            <h1 className="font-[family-name:var(--font-display)] text-5xl leading-none tracking-tight text-slate-950 sm:text-6xl">
-              One account, multiple storefronts, secure product management.
-            </h1>
-            <p className="max-w-2xl text-base leading-8 text-slate-600">
-              Sign in with Google or GitHub, create as many stores as you need,
-              and manage each catalog from a server-secured dashboard.
-            </p>
-          </div>
-
-          <div className="border border-black/10 bg-slate-950 p-6 text-white">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-4">
+    <main className="mx-auto max-w-[96rem] px-4 py-8 sm:px-6 lg:px-8">
+      <div className="grid gap-8 xl:grid-cols-[300px_minmax(0,1fr)]">
+        <aside className="space-y-6 xl:sticky xl:top-24 xl:h-fit">
+          <div className="rounded-[2rem] border border-slate-950 bg-slate-950 p-6 text-white shadow-sm">
+            <div className="space-y-4">
+              <div className="flex items-start gap-4">
                 {currentUser.image ? (
                   <img
                     alt={currentUser.name || currentUser.email}
-                    className="h-14 w-14 border border-white/10 object-cover"
+                    className="h-14 w-14 rounded-2xl border border-white/10 object-cover"
                     src={currentUser.image}
                   />
                 ) : (
-                  <div className="inline-flex h-14 w-14 items-center justify-center border border-white/10 bg-white/10 text-sm font-semibold text-white">
+                  <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-sm font-semibold text-white">
                     {getInitials(currentUser.name || currentUser.email)}
                   </div>
                 )}
-                <div>
-                  <p className="text-lg font-semibold tracking-tight">
+                <div className="min-w-0">
+                  <p className="text-lg font-semibold tracking-tight [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">
                     {currentUser.name || "Vendorly seller"}
                   </p>
-                  <p className="mt-1 text-sm text-white/70">{currentUser.email}</p>
+                  <p className="mt-1 break-all text-sm text-white/70">
+                    {currentUser.email}
+                  </p>
                 </div>
               </div>
               <form action={signOutAction}>
                 <button
                   type="submit"
-                  className="inline-flex border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/15"
+                  className="inline-flex w-full justify-center rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/15"
                 >
                   Sign out
                 </button>
               </form>
             </div>
 
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="border border-white/10 bg-white/8 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/55">
+            <div className="mt-6 grid gap-3">
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/55">
                   Stores owned
                 </p>
-                <p className="mt-3 text-4xl font-semibold tracking-tight">
+                <p className="mt-3 text-3xl font-semibold tracking-tight">
                   {stores.length}
                 </p>
               </div>
-              <div className="border border-white/10 bg-white/8 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/55">
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/55">
                   Products in view
                 </p>
-                <p className="mt-3 text-4xl font-semibold tracking-tight">
+                <p className="mt-3 text-3xl font-semibold tracking-tight">
                   {selectedStoreProducts.length}
                 </p>
               </div>
@@ -639,43 +694,36 @@ export function DashboardShell({
                 const result = await seedDemoDataAction();
                 await applyActionResult(result);
               }}
-              className="mt-6 inline-flex border border-white bg-white px-5 py-3 text-sm font-medium text-slate-950 transition hover:bg-slate-100"
+              className="mt-6 inline-flex w-full justify-center rounded-xl border border-white bg-white px-5 py-3 text-sm font-medium text-slate-950 transition hover:bg-slate-100"
             >
               Seed demo marketplace
             </button>
           </div>
-        </div>
-      </section>
 
-      <section className="mt-8 grid gap-6 lg:grid-cols-[1.12fr_0.88fr]">
-        <div className="space-y-6">
-          <div className="border border-black/10 bg-[rgba(255,253,247,0.92)] p-6 sm:p-8">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal-700">
-                  Your stores
-                </p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
-                  Switch between storefronts or start a new one.
-                </h2>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setStatus(null);
-                  setStoreForm(DEFAULT_STORE_FORM);
-                  setProductForm(DEFAULT_PRODUCT_FORM);
-                  setSelectedProductId(null);
-                  clearUploadedImages();
-                  navigateToStore(undefined);
-                }}
-                className="inline-flex border border-black/10 bg-[rgba(255,253,247,0.96)] px-5 py-3 text-sm font-medium text-slate-900 transition hover:border-slate-400 hover:bg-white/70"
-              >
-                Create new store
-              </button>
-            </div>
+          <Panel className="p-6">
+            <PanelHeader
+              eyebrow="Stores"
+              title="Your storefronts"
+              description="Pick a store to manage, or start a new one."
+              action={
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStatus(null);
+                    setStoreForm(DEFAULT_STORE_FORM);
+                    setProductForm(DEFAULT_PRODUCT_FORM);
+                    setSelectedProductId(null);
+                    clearUploadedImages();
+                    navigateToStore(undefined);
+                  }}
+                  className="inline-flex rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
+                >
+                  New store
+                </button>
+              }
+            />
 
-            <div className="mt-8 space-y-4">
+            <div className="mt-6 space-y-3">
               {stores.length > 0 ? (
                 stores.map((store) => (
                   <StoreListCard
@@ -689,408 +737,62 @@ export function DashboardShell({
                   />
                 ))
               ) : (
-                <div className="border border-dashed border-slate-400 bg-[rgba(255,253,247,0.9)] p-6 text-center">
+                <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
                   <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
                     No stores yet
                   </h3>
-                  <p className="mt-3 text-sm leading-8 text-slate-600">
+                  <p className="mt-3 text-sm leading-7 text-slate-600">
                     Create your first storefront to start selling on Vendorly.
                   </p>
                 </div>
               )}
             </div>
-          </div>
+          </Panel>
+        </aside>
 
-          <form
-            onSubmit={handleStoreSubmit}
-            className="border border-black/10 bg-[rgba(255,253,247,0.92)] p-6 sm:p-8"
-          >
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-6">
+          <Panel>
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal-700">
-                  Store editor
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
+                  Seller dashboard
                 </p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+                <h1 className="mt-4 font-[family-name:var(--font-display)] text-5xl leading-none tracking-tight text-slate-950 sm:text-6xl">
                   {selectedStore
-                    ? `Editing ${selectedStore.name}`
-                    : "Create a new branded storefront"}
-                </h2>
-              </div>
-              {previewUrl ? (
-                <a
-                  href={previewUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
-                >
-                  Preview storefront
-                </a>
-              ) : null}
-            </div>
-
-            <div className="mt-8 grid gap-5">
-              <Field label="Store name">
-                <TextInput
-                  onChange={(event) =>
-                    setStoreForm((current) => ({
-                      ...current,
-                      name: event.target.value,
-                      slug:
-                        current.slug || Boolean(selectedStore)
-                          ? current.slug
-                          : slugify(event.target.value),
-                    }))
-                  }
-                  placeholder="Aurora Atelier"
-                  value={storeForm.name}
-                />
-              </Field>
-              <Field label="Store slug">
-                <div className="flex gap-3">
-                  <TextInput
-                    onChange={(event) =>
-                      setStoreForm((current) => ({
-                        ...current,
-                        slug: event.target.value,
-                      }))
-                    }
-                    placeholder="aurora-atelier"
-                    value={storeForm.slug}
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setStoreForm((current) => ({
-                        ...current,
-                        slug: slugify(current.name),
-                      }))
-                    }
-                    className="border border-black/10 px-4 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-white/70"
-                  >
-                    Generate
-                  </button>
-                </div>
-              </Field>
-              <Field label="Description">
-                <Textarea
-                  onChange={(event) =>
-                    setStoreForm((current) => ({
-                      ...current,
-                      description: event.target.value,
-                    }))
-                  }
-                  placeholder="Tell buyers what makes this storefront unique."
-                  value={storeForm.description}
-                />
-              </Field>
-              <Field label="Store bio">
-                <Textarea
-                  onChange={(event) =>
-                    setStoreForm((current) => ({
-                      ...current,
-                      bio: event.target.value,
-                    }))
-                  }
-                  placeholder="Share the story behind the brand, your aesthetic, and what buyers can expect."
-                  value={storeForm.bio}
-                />
-              </Field>
-              <div className="grid gap-5 md:grid-cols-2">
-                <Field label="Store logo image URL">
-                  <TextInput
-                    onChange={(event) =>
-                      setStoreForm((current) => ({
-                        ...current,
-                        logoImage: event.target.value,
-                      }))
-                    }
-                    placeholder="https://images.unsplash.com/..."
-                    value={storeForm.logoImage}
-                  />
-                </Field>
-                <Field label="Banner image URL">
-                  <TextInput
-                    onChange={(event) =>
-                      setStoreForm((current) => ({
-                        ...current,
-                        bannerImage: event.target.value,
-                      }))
-                    }
-                    placeholder="https://images.unsplash.com/..."
-                    value={storeForm.bannerImage}
-                  />
-                </Field>
-              </div>
-              <div className="grid gap-5 md:grid-cols-[1fr_220px]">
-                <Field label="Theme color">
-                  <div className="flex items-center gap-3 border border-black/10 bg-[rgba(255,253,247,0.96)] px-4 py-3">
-                    <input
-                      type="color"
-                      className="h-10 w-12 border-0 bg-transparent p-0"
-                      onChange={(event) =>
-                        setStoreForm((current) => ({
-                          ...current,
-                          themeColor: event.target.value,
-                        }))
-                      }
-                      value={previewThemeColor}
-                    />
-                    <TextInput
-                      onChange={(event) =>
-                        setStoreForm((current) => ({
-                          ...current,
-                          themeColor: event.target.value,
-                        }))
-                      }
-                      value={storeForm.themeColor}
-                    />
-                  </div>
-                </Field>
-              </div>
-              <div className="grid gap-5 md:grid-cols-2">
-                <Field label="Website URL">
-                  <TextInput
-                    onChange={(event) =>
-                      setStoreForm((current) => ({
-                        ...current,
-                        websiteUrl: event.target.value,
-                      }))
-                    }
-                    placeholder="yourstore.com"
-                    value={storeForm.websiteUrl}
-                  />
-                </Field>
-                <Field label="Instagram URL">
-                  <TextInput
-                    onChange={(event) =>
-                      setStoreForm((current) => ({
-                        ...current,
-                        instagramUrl: event.target.value,
-                      }))
-                    }
-                    placeholder="instagram.com/yourstore"
-                    value={storeForm.instagramUrl}
-                  />
-                </Field>
-                <Field label="TikTok URL">
-                  <TextInput
-                    onChange={(event) =>
-                      setStoreForm((current) => ({
-                        ...current,
-                        tiktokUrl: event.target.value,
-                      }))
-                    }
-                    placeholder="tiktok.com/@yourstore"
-                    value={storeForm.tiktokUrl}
-                  />
-                </Field>
-                <Field label="X URL">
-                  <TextInput
-                    onChange={(event) =>
-                      setStoreForm((current) => ({
-                        ...current,
-                        xUrl: event.target.value,
-                      }))
-                    }
-                    placeholder="x.com/yourstore"
-                    value={storeForm.xUrl}
-                  />
-                </Field>
-              </div>
-              <Field label="Store layout">
-                <ThemeWrapper themeColor={previewThemeColor}>
-                  <LayoutSwitcher
-                    value={storeForm.layoutType}
-                    onChange={(layoutType) =>
-                      setStoreForm((current) => ({
-                        ...current,
-                        layoutType,
-                      }))
-                    }
-                  />
-                </ThemeWrapper>
-              </Field>
-            </div>
-
-            <button
-              type="submit"
-              disabled={submittingStore}
-              className="mt-8 inline-flex border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {submittingStore
-                ? "Saving..."
-                : selectedStore
-                  ? "Update storefront"
-                  : "Create storefront"}
-            </button>
-          </form>
-
-          <form
-            onSubmit={handleProductSubmit}
-            className="border border-black/10 bg-[rgba(255,253,247,0.92)] p-6 sm:p-8"
-          >
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal-700">
-                  Product editor
+                    ? `Manage ${selectedStore.name}`
+                    : "Set up your storefront workspace"}
+                </h1>
+                <p className="mt-5 max-w-3xl text-base leading-8 text-slate-600">
+                  Manage store details, add products, preview your storefront,
+                  and stay on top of customer conversations from one admin view.
                 </p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
-                  {selectedStore
-                    ? `Manage products for ${selectedStore.name}`
-                    : "Select a store to manage products"}
-                </h2>
               </div>
-              {selectedProductId ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedProductId(null);
-                    setProductForm(DEFAULT_PRODUCT_FORM);
-                    clearUploadedImages();
-                  }}
-                  className="inline-flex border border-black/10 bg-[rgba(255,253,247,0.96)] px-5 py-3 text-sm font-medium text-slate-900 transition hover:border-slate-400 hover:bg-white/70"
-                >
-                  Cancel edit
-                </button>
-              ) : null}
-            </div>
 
-            <div className="mt-8 grid gap-5">
-              <Field label="Title">
-                <TextInput
-                  onChange={(event) =>
-                    setProductForm((current) => ({
-                      ...current,
-                      title: event.target.value,
-                    }))
-                  }
-                  placeholder="Stoneware candle"
-                  value={productForm.title}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <MetricCard label="Stores" value={stores.length} />
+                <MetricCard
+                  label="Products"
+                  value={selectedStoreProducts.length}
                 />
-              </Field>
-              <Field label="Description">
-                <Textarea
-                  onChange={(event) =>
-                    setProductForm((current) => ({
-                      ...current,
-                      description: event.target.value,
-                    }))
-                  }
-                  placeholder="Describe materials, vibe, and what makes it special."
-                  value={productForm.description}
+                <MetricCard
+                  label="Inbox threads"
+                  value={selectedStore ? storeChatThreads.length : 0}
                 />
-              </Field>
-              <div className="grid gap-5 md:grid-cols-[220px_1fr]">
-                <Field label="Price (USD)">
-                  <TextInput
-                    min="0"
-                  onChange={(event) =>
-                    setProductForm((current) => ({
-                      ...current,
-                      price: event.target.value,
-                    }))
-                    }
-                    step="0.01"
-                    type="number"
-                    value={productForm.price}
-                  />
-                </Field>
-                <Field label="Product image URLs">
-                  <Textarea
-                    onChange={(event) =>
-                      setProductForm((current) => ({
-                        ...current,
-                        imagesText: event.target.value,
-                      }))
-                    }
-                    placeholder={
-                      "https://images.unsplash.com/photo-1\nhttps://images.unsplash.com/photo-2"
-                    }
-                    value={productForm.imagesText}
-                  />
-                </Field>
-              </div>
-              <Field label="Attach image files">
-                <div className="border border-dashed border-slate-400 bg-[rgba(255,253,247,0.96)] p-4">
-                  <input
-                    accept="image/*"
-                    className="block w-full text-sm text-slate-700 file:mr-4 file:border-0 file:bg-slate-950 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-slate-800"
-                    multiple
-                    onChange={handleImageUpload}
-                    type="file"
-                  />
-                  <p className="mt-3 text-sm leading-7 text-slate-600">
-                    Upload PNG, JPG, WEBP, or other image files. You can combine
-                    uploaded files with external image URLs.
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                    Active store
+                  </p>
+                  <p className="mt-3 text-lg font-semibold tracking-tight text-slate-950">
+                    {selectedStore?.name || "No store selected"}
                   </p>
                 </div>
-              </Field>
-              <div className="border border-dashed border-slate-400 bg-[rgba(255,253,247,0.84)] p-4">
-                <div className="flex items-center justify-between gap-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-                    Gallery preview
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    {productImagePreviews.length + uploadedImages.length} image
-                    {productImagePreviews.length + uploadedImages.length === 1
-                      ? ""
-                      : "s"}
-                  </p>
-                </div>
-                {productImagePreviews.length > 0 || uploadedImages.length > 0 ? (
-                  <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
-                    {productImagePreviews.map((image) => (
-                      <img
-                        key={image}
-                        alt=""
-                        className="aspect-square border border-black/10 object-cover"
-                        src={image}
-                      />
-                    ))}
-                    {uploadedImages.map((image) => (
-                      <div key={image.storageId} className="relative">
-                        <img
-                          alt=""
-                          className="aspect-square border border-black/10 object-cover"
-                          src={image.previewUrl}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeUploadedImage(image.storageId)}
-                          className="absolute right-2 top-2 bg-slate-950/85 px-2 py-1 text-xs font-medium text-white"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="mt-3 text-sm leading-7 text-slate-600">
-                    Paste one image URL per line, upload files, or combine both
-                    to build a product gallery.
-                  </p>
-                )}
               </div>
             </div>
-
-            <button
-              type="submit"
-              disabled={submittingProduct || uploadingImages || !selectedStore}
-              className="mt-8 inline-flex border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {uploadingImages
-                ? "Uploading images..."
-                : submittingProduct
-                ? "Saving..."
-                : selectedProductId
-                  ? "Update product"
-                  : "Add product"}
-            </button>
-          </form>
+          </Panel>
 
           {status ? (
             <div
-              className={`border px-5 py-4 text-sm ${
+              className={`rounded-2xl border px-5 py-4 text-sm shadow-sm ${
                 status.kind === "success"
                   ? "border-emerald-200 bg-emerald-50 text-emerald-800"
                   : "border-rose-200 bg-rose-50 text-rose-800"
@@ -1099,330 +801,751 @@ export function DashboardShell({
               {status.message}
             </div>
           ) : null}
-        </div>
 
-        <div className="space-y-6">
-          <ThemeWrapper themeColor={previewThemeColor}>
-            <div className="border border-black/10 bg-[rgba(255,253,247,0.92)] p-4">
-              <p className="px-2 pb-3 text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-                Live preview
-              </p>
-              <StoreBanner
-                bannerImage={storeForm.bannerImage}
-                description={
-                  storeForm.description || "Describe the mood and offer of your store."
-                }
-                logoImage={storeForm.logoImage}
-                name={storeForm.name || "Your Vendorly Store"}
-                themeColor={previewThemeColor}
-              />
-            </div>
-          </ThemeWrapper>
-
-          <div className="border border-black/10 bg-[rgba(255,253,247,0.92)] p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-              Store profile preview
-            </p>
-            <div className="mt-5 flex items-start gap-4">
-              {storeForm.logoImage ? (
-                <img
-                  alt={storeForm.name || "Store logo"}
-                  className="h-20 w-20 border border-black/10 object-cover"
-                  src={storeForm.logoImage}
-                />
-              ) : (
-                <div
-                  className="inline-flex h-20 w-20 items-center justify-center border border-black/10 text-lg font-semibold text-white"
-                  style={{ backgroundColor: previewThemeColor }}
-                >
-                  {getInitials(storeForm.name || "Vendorly Store")}
-                </div>
-              )}
-              <div className="space-y-3">
-                <h3 className="font-[family-name:var(--font-display)] text-3xl leading-none tracking-tight text-slate-950">
-                  {storeForm.name || "Your Vendorly Store"}
-                </h3>
-                <p className="text-sm leading-7 text-slate-600">
-                  {storeForm.description || "Your short storefront description will appear here."}
-                </p>
-              </div>
-            </div>
-            <p className="mt-5 text-sm leading-8 text-slate-600">
-              {storeForm.bio ||
-                "Use the store bio to tell buyers who you are, what you sell, and the feeling behind your brand."}
-            </p>
-            {previewSocialLinks.length > 0 ? (
-              <div className="mt-5 flex flex-wrap gap-2">
-                {previewSocialLinks.map((link) => (
-                  <span
-                    key={link.label}
-                    className="border border-black/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-slate-500"
-                  >
-                    {link.label}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="mt-5 text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-                Add website or social links to highlight them here.
-              </p>
-            )}
-          </div>
-
-          <div className="border border-black/10 bg-[rgba(255,253,247,0.92)] p-6">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-                  Existing products
-                </p>
-                <p className="mt-2 text-sm text-slate-600">
-                  {selectedStore
-                    ? `Showing products for ${selectedStore.name}`
-                    : "Choose a store to view products"}
-                </p>
-              </div>
-              {isNavigatingStore ? (
-                <span className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-                  Loading
-                </span>
-              ) : null}
-            </div>
-
-            <div className="mt-6 space-y-4">
-              {!selectedStore ? (
-                <EmptyProductsState />
-              ) : selectedStoreProducts.length > 0 ? (
-                selectedStoreProducts.map((product) => (
-                  <div key={product._id} className="space-y-3">
-                    <ProductCard
-                      layout="list"
-                      product={product}
-                      storeName={selectedStore.name}
-                      themeColor={selectedStore.themeColor}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setSelectedProductId(product._id)}
-                      className="inline-flex border border-black/10 bg-[rgba(255,253,247,0.96)] px-4 py-2 text-sm font-medium text-slate-900 transition hover:border-slate-400 hover:bg-white/70"
-                    >
-                      Edit product
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <EmptyProductsState />
-              )}
-            </div>
-          </div>
-
-          <div className="border border-black/10 bg-[rgba(255,253,247,0.92)] p-6">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-                  Customer inbox
-                </p>
-                <p className="mt-2 text-sm text-slate-600">
-                  {selectedStore
-                    ? `Buyer conversations for ${selectedStore.name}`
-                    : "Choose a store to view customer chats"}
-                </p>
-              </div>
-              {selectedStore ? (
-                <span className="border border-black/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-                  {storeChatThreads.length} thread
-                  {storeChatThreads.length === 1 ? "" : "s"}
-                </span>
-              ) : null}
-            </div>
-
-            <div className="mt-6">
-              {!selectedStore ? (
-                <div className="border border-dashed border-slate-400 bg-[rgba(255,253,247,0.88)] p-6 text-center">
-                  <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
-                    No store selected
-                  </h3>
-                  <p className="mt-3 text-sm leading-8 text-slate-600">
-                    Pick a store from the left to see customer questions and reply as the seller.
-                  </p>
-                </div>
-              ) : storeChatThreads.length === 0 ? (
-                <div className="border border-dashed border-slate-400 bg-[rgba(255,253,247,0.88)] p-6 text-center">
-                  <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
-                    No chats yet
-                  </h3>
-                  <p className="mt-3 text-sm leading-8 text-slate-600">
-                    Buyer messages from product cards or the storefront will appear here.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid gap-6 xl:grid-cols-[260px_minmax(0,1fr)]">
-                  <div className="space-y-3">
-                    {storeChatThreads.map((thread) => {
-                      const active = thread.viewerId === selectedChatViewerId;
-
-                      return (
-                        <button
-                          key={thread.viewerId}
-                          type="button"
-                          onClick={() => navigateToChat(thread.viewerId)}
-                          className={`w-full border p-4 text-left transition ${
-                            active
-                              ? "border-slate-950 bg-slate-950 text-white"
-                              : "border-black/10 bg-white hover:border-slate-400"
-                          }`}
+          <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_360px]">
+            <div className="space-y-6">
+              <form onSubmit={handleStoreSubmit}>
+                <Panel>
+                  <PanelHeader
+                    eyebrow="Store editor"
+                    title={
+                      selectedStore
+                        ? `Editing ${selectedStore.name}`
+                        : "Create a new storefront"
+                    }
+                    description="Update the store profile, branding, social links, and storefront layout."
+                    action={
+                      previewUrl ? (
+                        <a
+                          href={previewUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex rounded-xl border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
                         >
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <p className="text-sm font-semibold">
-                                {thread.viewerName || `Guest ${thread.viewerId.slice(0, 4)}`}
-                              </p>
-                              <p
-                                className={`mt-1 text-xs uppercase tracking-[0.2em] ${
-                                  active ? "text-white/60" : "text-slate-400"
-                                }`}
-                              >
-                                {thread.messageCount} message
-                                {thread.messageCount === 1 ? "" : "s"}
-                              </p>
-                            </div>
-                            <span
-                              className={`text-[0.68rem] ${
-                                active ? "text-white/65" : "text-slate-400"
-                              }`}
-                            >
-                              {formatChatTimestamp(thread.lastMessageAt)}
-                            </span>
-                          </div>
-                          {thread.lastProductTitle ? (
-                            <p
-                              className={`mt-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em] ${
-                                active ? "text-white/65" : "text-slate-400"
-                              }`}
-                            >
-                              {thread.lastProductTitle}
-                            </p>
-                          ) : null}
-                          <p
-                            className={`mt-2 text-sm leading-7 ${
-                              active ? "text-white/80" : "text-slate-600"
-                            }`}
-                          >
-                            {thread.lastMessageBody}
-                          </p>
+                          Preview storefront
+                        </a>
+                      ) : null
+                    }
+                  />
+
+                  <div className="mt-8 grid gap-5">
+                    <Field label="Store name">
+                      <TextInput
+                        onChange={(event) =>
+                          setStoreForm((current) => ({
+                            ...current,
+                            name: event.target.value,
+                            slug:
+                              current.slug || Boolean(selectedStore)
+                                ? current.slug
+                                : slugify(event.target.value),
+                          }))
+                        }
+                        placeholder="Aurora Atelier"
+                        value={storeForm.name}
+                      />
+                    </Field>
+
+                    <Field label="Store slug">
+                      <div className="flex gap-3">
+                        <TextInput
+                          onChange={(event) =>
+                            setStoreForm((current) => ({
+                              ...current,
+                              slug: event.target.value,
+                            }))
+                          }
+                          placeholder="aurora-atelier"
+                          value={storeForm.slug}
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setStoreForm((current) => ({
+                              ...current,
+                              slug: slugify(current.name),
+                            }))
+                          }
+                          className="rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-white"
+                        >
+                          Generate
                         </button>
-                      );
-                    })}
-                  </div>
-
-                  <div className="border border-black/10 bg-white">
-                    <div className="border-b border-black/10 px-5 py-4">
-                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-                        Active conversation
-                      </p>
-                      <h3 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
-                        {selectedChatThread?.viewerName ||
-                          (selectedChatViewerId
-                            ? `Guest ${selectedChatViewerId.slice(0, 4)}`
-                            : "Select a conversation")}
-                      </h3>
-                      <p className="mt-2 text-sm text-slate-600">
-                        Reply from your seller dashboard. New buyer messages appear here after refresh and update live on the buyer side.
-                      </p>
-                    </div>
-
-                    {selectedChatMessages.length > 0 ? (
-                      <div className="max-h-[28rem] space-y-4 overflow-y-auto px-5 py-5">
-                        {selectedChatMessages.map((message) => (
-                          <div
-                            key={message._id}
-                            className={`max-w-[88%] border px-4 py-3 text-sm leading-7 ${
-                              message.senderType === "seller"
-                                ? "ml-auto border-slate-950 bg-slate-950 text-white"
-                                : "border-black/10 bg-[rgba(255,253,247,0.88)] text-slate-700"
-                            }`}
-                          >
-                            <div className="mb-2 flex items-center justify-between gap-4 text-[0.68rem] font-semibold uppercase tracking-[0.22em]">
-                              <span
-                                className={
-                                  message.senderType === "seller"
-                                    ? "text-white/65"
-                                    : "text-slate-400"
-                                }
-                              >
-                                {message.senderType === "seller"
-                                  ? "Seller"
-                                  : message.viewerName ||
-                                    `Guest ${message.viewerId.slice(0, 4)}`}
-                              </span>
-                              <span
-                                className={
-                                  message.senderType === "seller"
-                                    ? "text-white/65"
-                                    : "text-slate-400"
-                                }
-                              >
-                                {formatChatTimestamp(message._creationTime)}
-                              </span>
-                            </div>
-                            {message.productTitle ? (
-                              <p
-                                className={`mb-2 text-[0.68rem] font-semibold uppercase tracking-[0.24em] ${
-                                  message.senderType === "seller"
-                                    ? "text-white/65"
-                                    : "text-slate-400"
-                                }`}
-                              >
-                                {message.productTitle}
-                              </p>
-                            ) : null}
-                            <p>{message.body}</p>
-                          </div>
-                        ))}
                       </div>
-                    ) : (
-                      <div className="px-5 py-6">
-                        <div className="border border-dashed border-slate-400 bg-[rgba(255,253,247,0.88)] p-6 text-center">
-                          <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
-                            Select a chat
-                          </h3>
-                          <p className="mt-3 text-sm leading-8 text-slate-600">
-                            Choose a conversation to read the thread and reply from here.
-                          </p>
-                        </div>
-                      </div>
-                    )}
+                    </Field>
 
-                    <form
-                      onSubmit={handleSellerReplySubmit}
-                      className="border-t border-black/10 px-5 py-5"
-                    >
-                      <Field label="Reply as seller">
-                        <Textarea
-                          onChange={(event) => setSellerReply(event.target.value)}
-                          placeholder="Answer questions about product details, shipping, or customization."
-                          value={sellerReply}
+                    <Field label="Description">
+                      <Textarea
+                        onChange={(event) =>
+                          setStoreForm((current) => ({
+                            ...current,
+                            description: event.target.value,
+                          }))
+                        }
+                        placeholder="Tell buyers what makes this storefront unique."
+                        value={storeForm.description}
+                      />
+                    </Field>
+
+                    <Field label="Store bio">
+                      <Textarea
+                        onChange={(event) =>
+                          setStoreForm((current) => ({
+                            ...current,
+                            bio: event.target.value,
+                          }))
+                        }
+                        placeholder="Share the story behind the brand, your aesthetic, and what buyers can expect."
+                        value={storeForm.bio}
+                      />
+                    </Field>
+
+                    <div className="grid gap-5 md:grid-cols-2">
+                      <Field label="Store logo image URL">
+                        <TextInput
+                          onChange={(event) =>
+                            setStoreForm((current) => ({
+                              ...current,
+                              logoImage: event.target.value,
+                            }))
+                          }
+                          placeholder="https://images.unsplash.com/..."
+                          value={storeForm.logoImage}
                         />
                       </Field>
-                      <button
-                        type="submit"
-                        disabled={
-                          submittingReply ||
-                          !selectedStore ||
-                          !selectedChatViewerId ||
-                          !sellerReply.trim()
+                      <Field label="Banner image URL">
+                        <TextInput
+                          onChange={(event) =>
+                            setStoreForm((current) => ({
+                              ...current,
+                              bannerImage: event.target.value,
+                            }))
+                          }
+                          placeholder="https://images.unsplash.com/..."
+                          value={storeForm.bannerImage}
+                        />
+                      </Field>
+                    </div>
+
+                    <div className="grid gap-5 md:grid-cols-[1fr_220px]">
+                      <Field label="Theme color">
+                        <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                          <input
+                            type="color"
+                            className="h-10 w-12 border-0 bg-transparent p-0"
+                            onChange={(event) =>
+                              setStoreForm((current) => ({
+                                ...current,
+                                themeColor: event.target.value,
+                              }))
+                            }
+                            value={previewThemeColor}
+                          />
+                          <input
+                            className="w-full border-0 bg-transparent text-sm text-slate-950 outline-none"
+                            onChange={(event) =>
+                              setStoreForm((current) => ({
+                                ...current,
+                                themeColor: event.target.value,
+                              }))
+                            }
+                            value={storeForm.themeColor}
+                          />
+                        </div>
+                      </Field>
+                    </div>
+
+                    <div className="grid gap-5 md:grid-cols-2">
+                      <Field label="Website URL">
+                        <TextInput
+                          onChange={(event) =>
+                            setStoreForm((current) => ({
+                              ...current,
+                              websiteUrl: event.target.value,
+                            }))
+                          }
+                          placeholder="yourstore.com"
+                          value={storeForm.websiteUrl}
+                        />
+                      </Field>
+                      <Field label="Instagram URL">
+                        <TextInput
+                          onChange={(event) =>
+                            setStoreForm((current) => ({
+                              ...current,
+                              instagramUrl: event.target.value,
+                            }))
+                          }
+                          placeholder="instagram.com/yourstore"
+                          value={storeForm.instagramUrl}
+                        />
+                      </Field>
+                      <Field label="TikTok URL">
+                        <TextInput
+                          onChange={(event) =>
+                            setStoreForm((current) => ({
+                              ...current,
+                              tiktokUrl: event.target.value,
+                            }))
+                          }
+                          placeholder="tiktok.com/@yourstore"
+                          value={storeForm.tiktokUrl}
+                        />
+                      </Field>
+                      <Field label="X URL">
+                        <TextInput
+                          onChange={(event) =>
+                            setStoreForm((current) => ({
+                              ...current,
+                              xUrl: event.target.value,
+                            }))
+                          }
+                          placeholder="x.com/yourstore"
+                          value={storeForm.xUrl}
+                        />
+                      </Field>
+                    </div>
+
+                    <Field label="Store layout">
+                      <ThemeWrapper themeColor={previewThemeColor}>
+                        <LayoutSwitcher
+                          value={storeForm.layoutType}
+                          onChange={(layoutType) =>
+                            setStoreForm((current) => ({
+                              ...current,
+                              layoutType,
+                            }))
+                          }
+                        />
+                      </ThemeWrapper>
+                    </Field>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={submittingStore}
+                    className="mt-8 inline-flex rounded-xl border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {submittingStore
+                      ? "Saving..."
+                      : selectedStore
+                        ? "Update storefront"
+                        : "Create storefront"}
+                  </button>
+                </Panel>
+              </form>
+
+              <form onSubmit={handleProductSubmit}>
+                <Panel>
+                  <PanelHeader
+                    eyebrow="Product editor"
+                    title={
+                      selectedStore
+                        ? `Manage products for ${selectedStore.name}`
+                        : "Select a store to manage products"
+                    }
+                    description="Add new products, update copy and pricing, and manage image galleries."
+                    action={
+                      selectedProductId ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedProductId(null);
+                            setProductForm(DEFAULT_PRODUCT_FORM);
+                            clearUploadedImages();
+                          }}
+                          className="inline-flex rounded-xl border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
+                        >
+                          Cancel edit
+                        </button>
+                      ) : null
+                    }
+                  />
+
+                  <div className="mt-8 grid gap-5">
+                    <Field label="Title">
+                      <TextInput
+                        onChange={(event) =>
+                          setProductForm((current) => ({
+                            ...current,
+                            title: event.target.value,
+                          }))
                         }
-                        className="mt-4 inline-flex w-full justify-center border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        {submittingReply ? "Sending..." : "Send reply"}
-                      </button>
-                    </form>
+                        placeholder="Stoneware candle"
+                        value={productForm.title}
+                      />
+                    </Field>
+
+                    <Field label="Description">
+                      <Textarea
+                        onChange={(event) =>
+                          setProductForm((current) => ({
+                            ...current,
+                            description: event.target.value,
+                          }))
+                        }
+                        placeholder="Describe materials, vibe, and what makes it special."
+                        value={productForm.description}
+                      />
+                    </Field>
+
+                    <div className="grid gap-5 md:grid-cols-[220px_1fr]">
+                      <Field label="Price (USD)">
+                        <TextInput
+                          min="0"
+                          onChange={(event) =>
+                            setProductForm((current) => ({
+                              ...current,
+                              price: event.target.value,
+                            }))
+                          }
+                          step="0.01"
+                          type="number"
+                          value={productForm.price}
+                        />
+                      </Field>
+                      <Field label="Product image URLs">
+                        <Textarea
+                          onChange={(event) =>
+                            setProductForm((current) => ({
+                              ...current,
+                              imagesText: event.target.value,
+                            }))
+                          }
+                          placeholder={
+                            "https://images.unsplash.com/photo-1\nhttps://images.unsplash.com/photo-2"
+                          }
+                          value={productForm.imagesText}
+                        />
+                      </Field>
+                    </div>
+
+                    <Field label="Attach image files">
+                      <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4">
+                        <input
+                          accept="image/*"
+                          className="block w-full text-sm text-slate-700 file:mr-4 file:rounded-xl file:border-0 file:bg-slate-950 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-slate-800"
+                          multiple
+                          onChange={handleImageUpload}
+                          type="file"
+                        />
+                        <p className="mt-3 text-sm leading-7 text-slate-600">
+                          Upload PNG, JPG, WEBP, or other image files. You can
+                          combine uploaded files with external image URLs.
+                        </p>
+                      </div>
+                    </Field>
+
+                    <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4">
+                      <div className="flex items-center justify-between gap-4">
+                        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                          Gallery preview
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {productImagePreviews.length + uploadedImages.length}{" "}
+                          image
+                          {productImagePreviews.length +
+                            uploadedImages.length ===
+                          1
+                            ? ""
+                            : "s"}
+                        </p>
+                      </div>
+                      {productImagePreviews.length > 0 ||
+                      uploadedImages.length > 0 ? (
+                        <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
+                          {productImagePreviews.map((image) => (
+                            <img
+                              key={image}
+                              alt=""
+                              className="aspect-square rounded-2xl border border-slate-200 object-cover"
+                              src={image}
+                            />
+                          ))}
+                          {uploadedImages.map((image) => (
+                            <div key={image.storageId} className="relative">
+                              <img
+                                alt=""
+                                className="aspect-square rounded-2xl border border-slate-200 object-cover"
+                                src={image.previewUrl}
+                              />
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  removeUploadedImage(image.storageId)
+                                }
+                                className="absolute right-2 top-2 rounded-lg bg-slate-950/85 px-2 py-1 text-xs font-medium text-white"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="mt-3 text-sm leading-7 text-slate-600">
+                          Paste one image URL per line, upload files, or combine
+                          both to build a product gallery.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={
+                      submittingProduct || uploadingImages || !selectedStore
+                    }
+                    className="mt-8 inline-flex rounded-xl border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {uploadingImages
+                      ? "Uploading images..."
+                      : submittingProduct
+                        ? "Saving..."
+                        : selectedProductId
+                          ? "Update product"
+                          : "Add product"}
+                  </button>
+                </Panel>
+              </form>
+
+              <Panel>
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                      Existing products
+                    </p>
+                    <p className="mt-2 text-sm text-slate-600">
+                      {selectedStore
+                        ? `Showing products for ${selectedStore.name}`
+                        : "Choose a store to view products"}
+                    </p>
+                  </div>
+                  {isNavigatingStore ? (
+                    <span className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
+                      Loading
+                    </span>
+                  ) : null}
+                </div>
+
+                <div className="mt-6 space-y-4">
+                  {!selectedStore ? (
+                    <EmptyProductsState />
+                  ) : selectedStoreProducts.length > 0 ? (
+                    selectedStoreProducts.map((product) => (
+                      <div key={product._id} className="space-y-3">
+                        <ProductCard
+                          layout="list"
+                          product={product}
+                          storeName={selectedStore.name}
+                          themeColor={selectedStore.themeColor}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setSelectedProductId(product._id)}
+                          className="inline-flex rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
+                        >
+                          Edit product
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <EmptyProductsState />
+                  )}
+                </div>
+              </Panel>
+
+              <Panel>
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                      Customer inbox
+                    </p>
+                    <p className="mt-2 text-sm text-slate-600">
+                      {selectedStore
+                        ? `Buyer conversations for ${selectedStore.name}`
+                        : "Choose a store to view customer chats"}
+                    </p>
+                  </div>
+                  {selectedStore ? (
+                    <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                      {storeChatThreads.length} thread
+                      {storeChatThreads.length === 1 ? "" : "s"}
+                    </span>
+                  ) : null}
+                </div>
+
+                <div className="mt-6">
+                  {!selectedStore ? (
+                    <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+                      <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+                        No store selected
+                      </h3>
+                      <p className="mt-3 text-sm leading-7 text-slate-600">
+                        Pick a store from the sidebar to see customer questions
+                        and reply as the seller.
+                      </p>
+                    </div>
+                  ) : storeChatThreads.length === 0 ? (
+                    <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+                      <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+                        No chats yet
+                      </h3>
+                      <p className="mt-3 text-sm leading-7 text-slate-600">
+                        Buyer messages from product cards or the storefront will
+                        appear here.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-6 xl:grid-cols-[260px_minmax(0,1fr)]">
+                      <div className="space-y-3">
+                        {storeChatThreads.map((thread) => {
+                          const active =
+                            thread.viewerId === selectedChatViewerId;
+
+                          return (
+                            <button
+                              key={thread.viewerId}
+                              type="button"
+                              onClick={() => navigateToChat(thread.viewerId)}
+                              className={`w-full rounded-2xl border p-4 text-left transition ${
+                                active
+                                  ? "border-slate-950 bg-slate-950 text-white"
+                                  : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white"
+                              }`}
+                            >
+                              <div className="flex items-start justify-between gap-3">
+                                <div>
+                                  <p className="text-sm font-semibold">
+                                    {thread.viewerName ||
+                                      `Guest ${thread.viewerId.slice(0, 4)}`}
+                                  </p>
+                                  <p
+                                    className={`mt-1 text-xs uppercase tracking-[0.2em] ${
+                                      active
+                                        ? "text-white/60"
+                                        : "text-slate-400"
+                                    }`}
+                                  >
+                                    {thread.messageCount} message
+                                    {thread.messageCount === 1 ? "" : "s"}
+                                  </p>
+                                </div>
+                                <span
+                                  className={`text-[0.68rem] ${
+                                    active ? "text-white/65" : "text-slate-400"
+                                  }`}
+                                >
+                                  {formatChatTimestamp(thread.lastMessageAt)}
+                                </span>
+                              </div>
+                              {thread.lastProductTitle ? (
+                                <p
+                                  className={`mt-3 text-[0.68rem] font-semibold uppercase tracking-[0.22em] ${
+                                    active ? "text-white/65" : "text-slate-400"
+                                  }`}
+                                >
+                                  {thread.lastProductTitle}
+                                </p>
+                              ) : null}
+                              <p
+                                className={`mt-2 text-sm leading-7 ${
+                                  active ? "text-white/80" : "text-slate-600"
+                                }`}
+                              >
+                                {thread.lastMessageBody}
+                              </p>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white">
+                        <div className="border-b border-slate-200 px-5 py-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                            Active conversation
+                          </p>
+                          <h3 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
+                            {selectedChatThread?.viewerName ||
+                              (selectedChatViewerId
+                                ? `Guest ${selectedChatViewerId.slice(0, 4)}`
+                                : "Select a conversation")}
+                          </h3>
+                          <p className="mt-2 text-sm leading-7 text-slate-600">
+                            Reply from your seller dashboard. New buyer messages
+                            appear here after refresh and update live on the
+                            buyer side.
+                          </p>
+                        </div>
+
+                        {selectedChatMessages.length > 0 ? (
+                          <div className="max-h-[28rem] space-y-4 overflow-y-auto bg-slate-50 px-5 py-5">
+                            {selectedChatMessages.map((message) => (
+                              <div
+                                key={message._id}
+                                className={`max-w-[88%] rounded-3xl border px-4 py-3 text-sm leading-7 ${
+                                  message.senderType === "seller"
+                                    ? "ml-auto border-slate-950 bg-slate-950 text-white"
+                                    : "border-slate-200 bg-white text-slate-700"
+                                }`}
+                              >
+                                <div className="mb-2 flex items-center justify-between gap-4 text-[0.68rem] font-semibold uppercase tracking-[0.22em]">
+                                  <span
+                                    className={
+                                      message.senderType === "seller"
+                                        ? "text-white/65"
+                                        : "text-slate-400"
+                                    }
+                                  >
+                                    {message.senderType === "seller"
+                                      ? "Seller"
+                                      : message.viewerName ||
+                                        `Guest ${message.viewerId.slice(0, 4)}`}
+                                  </span>
+                                  <span
+                                    className={
+                                      message.senderType === "seller"
+                                        ? "text-white/65"
+                                        : "text-slate-400"
+                                    }
+                                  >
+                                    {formatChatTimestamp(message._creationTime)}
+                                  </span>
+                                </div>
+                                {message.productTitle ? (
+                                  <p
+                                    className={`mb-2 text-[0.68rem] font-semibold uppercase tracking-[0.22em] ${
+                                      message.senderType === "seller"
+                                        ? "text-white/65"
+                                        : "text-slate-400"
+                                    }`}
+                                  >
+                                    {message.productTitle}
+                                  </p>
+                                ) : null}
+                                <p>{message.body}</p>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="px-5 py-6">
+                            <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+                              <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+                                Select a chat
+                              </h3>
+                              <p className="mt-3 text-sm leading-7 text-slate-600">
+                                Choose a conversation to read the thread and
+                                reply from here.
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        <form
+                          onSubmit={handleSellerReplySubmit}
+                          className="border-t border-slate-200 px-5 py-5"
+                        >
+                          <Field label="Reply as seller">
+                            <Textarea
+                              onChange={(event) =>
+                                setSellerReply(event.target.value)
+                              }
+                              placeholder="Answer questions about product details, shipping, or customization."
+                              value={sellerReply}
+                            />
+                          </Field>
+                          <button
+                            type="submit"
+                            disabled={
+                              submittingReply ||
+                              !selectedStore ||
+                              !selectedChatViewerId ||
+                              !sellerReply.trim()
+                            }
+                            className="mt-4 inline-flex w-full justify-center rounded-xl border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {submittingReply ? "Sending..." : "Send reply"}
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Panel>
+            </div>
+
+            <div className="space-y-6 2xl:sticky 2xl:top-24 2xl:h-fit">
+              <ThemeWrapper themeColor={previewThemeColor}>
+                <Panel className="p-4">
+                  <p className="px-2 pb-3 text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                    Live preview
+                  </p>
+                  <StoreBanner
+                    bannerImage={storeForm.bannerImage}
+                    description={
+                      storeForm.description ||
+                      "Describe the mood and offer of your store."
+                    }
+                    logoImage={storeForm.logoImage}
+                    name={storeForm.name || "Your Vendorly Store"}
+                    themeColor={previewThemeColor}
+                    variant="compact"
+                  />
+                </Panel>
+              </ThemeWrapper>
+
+              <Panel>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                  Store profile preview
+                </p>
+                <div className="mt-5 flex items-start gap-4">
+                  {storeForm.logoImage ? (
+                    <img
+                      alt={storeForm.name || "Store logo"}
+                      className="h-20 w-20 rounded-3xl border border-slate-200 object-cover"
+                      src={storeForm.logoImage}
+                    />
+                  ) : (
+                    <div
+                      className="inline-flex h-20 w-20 items-center justify-center rounded-3xl border border-slate-200 text-lg font-semibold text-white"
+                      style={{ backgroundColor: previewThemeColor }}
+                    >
+                      {getInitials(storeForm.name || "Vendorly Store")}
+                    </div>
+                  )}
+                  <div className="space-y-3">
+                    <h3 className="font-[family-name:var(--font-display)] text-3xl leading-none tracking-tight text-slate-950">
+                      {storeForm.name || "Your Vendorly Store"}
+                    </h3>
+                    <p className="text-sm leading-7 text-slate-600">
+                      {storeForm.description ||
+                        "Your short storefront description will appear here."}
+                    </p>
                   </div>
                 </div>
-              )}
+                <p className="mt-5 text-sm leading-7 text-slate-600">
+                  {storeForm.bio ||
+                    "Use the store bio to tell buyers who you are, what you sell, and the feeling behind your brand."}
+                </p>
+                {previewSocialLinks.length > 0 ? (
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {previewSocialLinks.map((link) => (
+                      <span
+                        key={link.label}
+                        className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500"
+                      >
+                        {link.label}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-5 text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                    Add website or social links to highlight them here.
+                  </p>
+                )}
+              </Panel>
             </div>
           </div>
         </div>
-      </section>
+      </div>
     </main>
   );
 }

@@ -41,7 +41,9 @@ export function ProductSocialCard({
   const totalReactions =
     product.reactionCount ?? getTotalReactionCount(product.reactionCounts);
   const resolvedStoreName =
-    storeName ?? ("store" in product ? product.store?.name : undefined) ?? "Vendorly store";
+    storeName ??
+    ("store" in product ? product.store?.name : undefined) ??
+    "Vendorly store";
   const resolvedThemeColor =
     themeColor ?? ("store" in product ? product.store?.themeColor : undefined);
 
@@ -69,14 +71,14 @@ export function ProductSocialCard({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="flex h-full flex-col gap-3">
       <ProductCard
         footerContent={
-          <div className="flex flex-wrap items-center justify-end gap-2">
+          <>
             <button
               type="button"
               onClick={() => cart.addItem(product, resolvedStoreName)}
-              className="inline-flex items-center border border-slate-950 bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+              className="inline-flex items-center rounded-xl border border-slate-950 bg-slate-950 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
             >
               Add to cart
             </button>
@@ -94,25 +96,26 @@ export function ProductSocialCard({
                   themeColor: resolvedThemeColor,
                 })
               }
-              className="inline-flex items-center border border-black/10 bg-white px-4 py-2 text-sm font-medium text-slate-900 transition hover:border-slate-400"
+              className="inline-flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
             >
               Chat store
             </button>
-          </div>
+          </>
         }
         layout={layout}
         product={product}
         storeName={resolvedStoreName}
         themeColor={resolvedThemeColor}
       />
-      <div className="border border-black/10 bg-[rgba(255,253,247,0.9)] px-4 py-4">
+      <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-slate-500">
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-slate-400">
               Product reactions
             </p>
             <p className="mt-2 text-sm text-slate-600">
-              {totalReactions} total reaction{totalReactions === 1 ? "" : "s"} so far.
+              {totalReactions} total reaction{totalReactions === 1 ? "" : "s"}{" "}
+              so far.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -126,10 +129,10 @@ export function ProductSocialCard({
                   type="button"
                   disabled={isPending || !viewerId}
                   onClick={() => handleReaction(option.value)}
-                  className={`inline-flex items-center gap-2 border px-3 py-2 text-sm font-medium transition ${
+                  className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition ${
                     active
                       ? "border-slate-950 bg-slate-950 text-white"
-                      : "border-black/10 bg-white text-slate-700 hover:border-slate-400"
+                      : "border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 hover:bg-white"
                   } ${isPending || !viewerId ? "cursor-not-allowed opacity-60" : ""}`}
                   aria-label={`${option.label} reaction`}
                 >
@@ -145,9 +148,7 @@ export function ProductSocialCard({
             })}
           </div>
         </div>
-        {error ? (
-          <p className="mt-3 text-sm text-rose-600">{error}</p>
-        ) : null}
+        {error ? <p className="mt-3 text-sm text-rose-600">{error}</p> : null}
       </div>
     </div>
   );

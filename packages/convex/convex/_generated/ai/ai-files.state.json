@@ -1,7 +1,7 @@
 {
   "guidelinesHash": "294b619f8246c26bd6bfb6a57122503f0e2149872fc6b26609b7a95bfefaf2b8",
-  "agentsMdSectionHash": "bbf30bd25ceea0aefd279d62e1cb2b4c207fcb712b69adf26f3d02b296ffc7b2",
-  "claudeMdHash": "bbf30bd25ceea0aefd279d62e1cb2b4c207fcb712b69adf26f3d02b296ffc7b2",
+  "agentsMdSectionHash": "ccdda8e20bed58e384cc020152f1ebd577396f9d7b77e5f333c34aa32ada139a",
+  "claudeMdHash": "ccdda8e20bed58e384cc020152f1ebd577396f9d7b77e5f333c34aa32ada139a",
   "agentSkillsSha": "dc8ff761cfe4da450af2ea8a9ec708f737064bed",
   "installedSkillNames": [
     "convex-create-component",

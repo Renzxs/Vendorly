@@ -15,7 +15,7 @@ export function LayoutSwitcher({
   return (
     <div
       className={cn(
-        "grid gap-3 border border-black/10 bg-[rgba(255,253,247,0.94)] p-3 sm:grid-cols-2",
+        "grid gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 sm:grid-cols-2",
         className,
       )}
     >
@@ -28,17 +28,16 @@ export function LayoutSwitcher({
             type="button"
             onClick={() => onChange?.(option.value)}
             className={cn(
-              "border px-4 py-4 text-left transition",
+              "rounded-xl border px-4 py-4 text-left transition",
               active
-                ? "bg-white"
-                : "border-black/10 bg-transparent hover:border-slate-400 hover:bg-white/70",
+                ? "border-transparent bg-white shadow-sm"
+                : "border-transparent bg-transparent hover:border-slate-200 hover:bg-white",
             )}
             style={
               active
                 ? {
-                    borderColor: "var(--vendorly-theme)",
                     boxShadow:
-                      "inset 0 0 0 1px color-mix(in srgb, var(--vendorly-theme) 34%, white)",
+                      "inset 0 0 0 1px color-mix(in srgb, var(--vendorly-theme) 35%, white)",
                   }
                 : undefined
             }
@@ -46,7 +45,7 @@ export function LayoutSwitcher({
             <div className="mb-3 flex items-center gap-2">
               <span
                 className={cn(
-                  "border border-black/10 bg-slate-100",
+                  "rounded-md border border-slate-200 bg-slate-100",
                   option.value === "grid" ? "h-8 w-10" : "h-8 w-16",
                 )}
               />
@@ -54,7 +53,9 @@ export function LayoutSwitcher({
                 {option.label}
               </span>
             </div>
-            <p className="text-sm text-slate-600">{option.description}</p>
+            <p className="text-sm leading-6 text-slate-600">
+              {option.description}
+            </p>
           </button>
         );
       })}

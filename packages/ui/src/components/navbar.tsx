@@ -29,37 +29,37 @@ export function Navbar({
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 border-b border-black/10 bg-[rgba(247,242,232,0.9)] backdrop-blur",
+        "sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/85",
         className,
       )}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-8">
+      <div className="mx-auto flex max-w-[88rem] flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 items-center gap-8">
           <a href="/" className="flex items-center gap-4">
             <Logo
               label={badge}
               textClassName="space-y-0.5"
-              markClassName="shrink-0"
+              markClassName="shrink-0 bg-white"
             />
           </a>
-          <nav className="hidden items-center gap-6 md:flex">
+          <nav className="hidden items-center gap-6 lg:flex">
             {links.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="border-b border-transparent pb-1 text-sm font-medium text-slate-600 transition hover:border-slate-400 hover:text-slate-950"
+                className="text-sm font-medium text-slate-600 transition hover:text-slate-950"
               >
                 {link.label}
               </a>
             ))}
           </nav>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-end gap-3">
           {rightAccessory}
           {ctaHref && ctaLabel ? (
             <a
               href={ctaHref}
-              className="inline-flex items-center gap-2 border border-slate-950 bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-950 bg-slate-950 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
             >
               {ctaLabel}
             </a>

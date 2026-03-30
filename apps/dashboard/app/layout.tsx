@@ -23,12 +23,12 @@ export default function RootLayout({
       <body className="font-[family-name:var(--font-sans)] text-slate-950 antialiased">
         <Providers>
           <Navbar
-            badge="Seller dashboard"
+            badge="Vendorly admin"
             ctaHref="http://localhost:3000"
-            ctaLabel="View marketplace"
+            ctaLabel="View shop"
             links={[
-              { href: "/dashboard", label: "Dashboard" },
-              { href: "http://localhost:3000", label: "Storefronts" },
+              { href: "/dashboard", label: "Overview" },
+              { href: "http://localhost:3000", label: "Marketplace" },
             ]}
           />
           {children}

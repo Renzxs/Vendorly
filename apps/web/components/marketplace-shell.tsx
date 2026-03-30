@@ -10,56 +10,63 @@ import type { MarketplaceProduct, Store } from "@vendorly/utils";
 import { ProductSocialCard } from "./product-social-card";
 import { useViewerId } from "@/lib/use-viewer-id";
 
-function SectionHeading({
+function SectionTitle({
   eyebrow,
   title,
-  description,
+  body,
 }: {
-  description: string;
+  body: string;
   eyebrow: string;
   title: string;
 }) {
   return (
-    <div className="max-w-3xl space-y-4">
-      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-teal-700">
+    <div className="space-y-2">
+      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
         {eyebrow}
       </p>
-      <h2 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
+      <h2 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
         {title}
       </h2>
-      <p className="max-w-2xl text-sm leading-8 text-slate-600 sm:text-base">
-        {description}
+      <p className="max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+        {body}
       </p>
     </div>
   );
 }
 
-function LoadingRail() {
+function LoadingStoreGrid() {
   return (
-    <div className="space-y-4">
+    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
       {Array.from({ length: 3 }).map((_, index) => (
         <div
           key={index}
-          className="h-52 animate-pulse border border-black/10 bg-[rgba(255,253,247,0.86)]"
+          className="h-72 animate-pulse rounded-3xl border border-slate-200 bg-white"
         />
       ))}
     </div>
   );
 }
 
-function EmptyState({
-  body,
-  title,
-}: {
-  body: string;
-  title: string;
-}) {
+function LoadingProductGrid() {
   return (
-    <div className="border border-dashed border-slate-400 bg-[rgba(255,253,247,0.88)] p-8 text-center">
+    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <div key={index} className="space-y-3">
+          <div className="h-80 animate-pulse rounded-3xl border border-slate-200 bg-white" />
+          <div className="h-24 animate-pulse rounded-2xl border border-slate-200 bg-white" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function EmptyState({ body, title }: { body: string; title: string }) {
+  return (
+    <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
       <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
         {title}
       </h3>
-      <p className="mt-4 text-sm leading-8 text-slate-600">{body}</p>
+      <p className="mt-4 text-sm leading-7 text-slate-600">{body}</p>
     </div>
   );
 }
@@ -92,99 +99,129 @@ export function MarketplaceShell() {
   }, [deferredSearchTerm, products, selectedStore]);
 
   return (
-    <main className="pb-24">
-      <section className="border-b border-black/10">
-        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-[1.12fr_0.88fr] lg:items-end">
-            <div className="space-y-8">
-              <div className="inline-flex border border-black/10 bg-[rgba(255,253,247,0.9)] px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.32em] text-slate-500">
-                Vendorly marketplace
-              </div>
-              <div className="space-y-6">
-                <h1 className="max-w-5xl font-[family-name:var(--font-display)] text-5xl leading-none tracking-tight text-slate-950 sm:text-6xl lg:text-7xl">
-                  Commerce that feels curated, not crowded.
-                </h1>
-                <p className="max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
-                  Buyers browse standout products and seller-run storefronts in a
-                  calmer, more editorial marketplace. Follow stores, react to
-                  products, and keep tabs on new drops from brands you care about.
+    <main className="mx-auto max-w-[88rem] px-4 py-8 sm:px-6 lg:px-8">
+      <section className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+        <div className="grid gap-0 lg:grid-cols-[minmax(0,1.2fr)_360px]">
+          <div className="p-8 sm:p-10">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
+              Vendorly marketplace
+            </p>
+            <h1 className="mt-4 max-w-4xl font-[family-name:var(--font-display)] text-5xl leading-none tracking-tight text-slate-950 sm:text-6xl">
+              Shop storefronts with a familiar ecommerce flow.
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600">
+              Browse products, filter by seller, chat with stores, and keep your
+              cart moving without having to fight through oversized bento
+              panels.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a
+                href="#products"
+                className="inline-flex items-center rounded-xl border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
+              >
+                Shop products
+              </a>
+              <a
+                href="/feed"
+                className="inline-flex items-center rounded-xl border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
+              >
+                View feed
+              </a>
+            </div>
+            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                  Products
+                </p>
+                <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+                  {products?.length ?? 0}
                 </p>
               </div>
-              <div className="flex flex-wrap gap-3">
-                <a
-                  href="#products"
-                  className="inline-flex items-center border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
-                >
-                  Browse products
-                </a>
-                <a
-                  href="/feed"
-                  className="inline-flex items-center border border-black/10 bg-[rgba(255,253,247,0.9)] px-5 py-3 text-sm font-medium text-slate-900 transition hover:border-slate-400"
-                >
-                  Open product feed
-                </a>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                  Stores
+                </p>
+                <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+                  {stores?.length ?? 0}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                  Seller tools
+                </p>
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  Launch and manage stores from the admin dashboard.
+                </p>
               </div>
             </div>
-            <div className="border border-black/10 bg-[rgba(255,253,247,0.92)]">
-              <div className="border-b border-black/10 px-6 py-4">
-                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.32em] text-slate-500">
-                  Live marketplace snapshot
+          </div>
+
+          <div className="border-t border-slate-200 bg-slate-50 p-8 lg:border-l lg:border-t-0">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+                  Featured stores
                 </p>
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+                  Shop by brand
+                </h2>
               </div>
-              <div className="grid sm:grid-cols-2">
-                <div className="border-b border-black/10 px-6 py-6 sm:border-b-0 sm:border-r">
-                  <p className="text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-slate-500">
-                    Featured products
-                  </p>
-                  <p className="mt-4 font-[family-name:var(--font-display)] text-6xl leading-none tracking-tight text-slate-950">
-                    {products?.length ?? 0}
-                  </p>
-                </div>
-                <div className="px-6 py-6">
-                  <p className="text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-slate-500">
-                    Live storefronts
-                  </p>
-                  <p className="mt-4 font-[family-name:var(--font-display)] text-6xl leading-none tracking-tight text-slate-950">
-                    {stores?.length ?? 0}
-                  </p>
-                </div>
-              </div>
-              <div className="border-t border-black/10 bg-slate-950 px-6 py-6 text-white">
-                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-white/55">
-                  Seller-first setup
-                </p>
-                <p className="mt-4 max-w-md text-sm leading-8 text-white/78">
-                  Multi-store ownership, OAuth login, dynamic storefront themes, and
-                  a product editor that supports URL images or uploaded files in one place.
-                </p>
-              </div>
+              <a
+                href={dashboardUrl}
+                className="text-sm font-medium text-slate-700 transition hover:text-slate-950"
+              >
+                Become a seller
+              </a>
+            </div>
+            <div className="mt-6 space-y-4">
+              {(featuredStores.length > 0 ? featuredStores : (stores ?? []))
+                .slice(0, 3)
+                .map((store) => (
+                  <a
+                    key={store._id}
+                    href={`/store/${store.slug}`}
+                    className="block rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-slate-300"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-950">
+                          {store.name}
+                        </p>
+                        <p className="mt-2 text-sm leading-6 text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">
+                          {store.description}
+                        </p>
+                      </div>
+                      <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
+                        {store.layoutType}
+                      </span>
+                    </div>
+                  </a>
+                ))}
             </div>
           </div>
         </div>
       </section>
 
-      <section
-        id="stores"
-        className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8"
-      >
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-          <SectionHeading
+      <section id="stores" className="mt-10">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <SectionTitle
             eyebrow="Featured stores"
-            title="Independent brand worlds with their own rhythm."
-            description="Each seller gets a dedicated storefront with banner imagery, custom accent color, and a layout that can shift between a catalog grid and a product-led list."
+            title="Brands with their own storefront identity"
+            body="Use the same marketplace, but land shoppers in a cleaner, store-first experience instead of a stacked editorial wall."
           />
           <a
             href={dashboardUrl}
-            className="inline-flex w-fit border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
+            className="inline-flex w-fit items-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-slate-300"
           >
-            Launch your store
+            Open seller dashboard
           </a>
         </div>
-        <div className="mt-10">
+
+        <div className="mt-6">
           {stores === undefined ? (
-            <LoadingRail />
+            <LoadingStoreGrid />
           ) : featuredStores.length > 0 ? (
-            <div className="space-y-4">
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {featuredStores.map((store) => (
                 <StoreCard key={store._id} store={store} />
               ))}
@@ -198,68 +235,110 @@ export function MarketplaceShell() {
         </div>
       </section>
 
-      <section id="products" className="border-t border-black/10">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-            <SectionHeading
-              eyebrow="Marketplace products"
-              title="A calmer product rail with live reactions."
-              description="Search across titles, descriptions, and store names, then filter down to a specific storefront. Follow the stores you love and react to their latest drops."
-            />
-            <div className="w-full max-w-xl border border-black/10 bg-[rgba(255,253,247,0.92)]">
-              <div className="grid gap-0 lg:grid-cols-[1fr_220px]">
-                <label className="border-b border-black/10 px-5 py-4 lg:border-b-0 lg:border-r">
-                  <span className="mb-2 block text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-slate-500">
-                    Search products
-                  </span>
-                  <input
-                    className="w-full border-0 bg-transparent text-sm text-slate-950 outline-none placeholder:text-slate-400"
-                    onChange={(event) => setSearchTerm(event.target.value)}
-                    placeholder="Search candles, notebooks, slings..."
-                    value={searchTerm}
-                  />
-                </label>
-                <label className="px-5 py-4">
-                  <span className="mb-2 block text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-slate-500">
-                    Filter by store
-                  </span>
-                  <select
-                    className="w-full border-0 bg-transparent text-sm text-slate-950 outline-none"
-                    onChange={(event) => setSelectedStore(event.target.value)}
-                    value={selectedStore}
-                  >
-                    <option value="all">All storefronts</option>
-                    {(stores ?? []).map((store) => (
-                      <option key={store._id} value={store._id}>
-                        {store.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+      <section id="products" className="mt-12">
+        <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
+          <aside className="h-fit rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm lg:sticky lg:top-24">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
+              Filters
+            </p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
+              Narrow your shopping view
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-slate-600">
+              Search products, jump to a specific storefront, and keep the
+              catalog focused on what shoppers actually want to see.
+            </p>
+
+            <div className="mt-6 space-y-5">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                  Search
+                </span>
+                <input
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-300 focus:bg-white"
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                  placeholder="Search products or stores"
+                  value={searchTerm}
+                />
+              </label>
+
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                  Store
+                </span>
+                <select
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-slate-300 focus:bg-white"
+                  onChange={(event) => setSelectedStore(event.target.value)}
+                  value={selectedStore}
+                >
+                  <option value="all">All storefronts</option>
+                  {(stores ?? []).map((store) => (
+                    <option key={store._id} value={store._id}>
+                      {store.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <div className="mt-6 grid gap-3">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                  Results
+                </p>
+                <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+                  {filteredProducts.length}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                  Store filter
+                </p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  {selectedStore === "all"
+                    ? "Browsing across every storefront."
+                    : ((stores ?? []).find(
+                        (store) => store._id === selectedStore,
+                      )?.name ?? "Selected storefront")}
+                </p>
               </div>
             </div>
-          </div>
+          </aside>
 
-          <div className="mt-10">
-            {products === undefined ? (
-              <LoadingRail />
-            ) : filteredProducts.length > 0 ? (
-              <div className="space-y-5">
-                {filteredProducts.map((product) => (
-                  <ProductSocialCard
-                    key={product._id}
-                    layout="list"
-                    product={product}
-                    viewerId={viewerId}
-                  />
-                ))}
-              </div>
-            ) : (
-              <EmptyState
-                title="No products match that search"
-                body="Try another keyword or filter. Once products are created in the seller dashboard, they appear here automatically."
+          <div>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <SectionTitle
+                eyebrow="Products"
+                title="Catalog"
+                body="A standard storefront grid keeps more products visible on screen and makes browsing feel faster."
               />
-            )}
+              <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 shadow-sm">
+                Showing {filteredProducts.length} item
+                {filteredProducts.length === 1 ? "" : "s"}
+              </div>
+            </div>
+
+            <div className="mt-6">
+              {products === undefined ? (
+                <LoadingProductGrid />
+              ) : filteredProducts.length > 0 ? (
+                <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                  {filteredProducts.map((product) => (
+                    <ProductSocialCard
+                      key={product._id}
+                      layout="grid"
+                      product={product}
+                      viewerId={viewerId}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  title="No products match that search"
+                  body="Try another keyword or filter. Once products are created in the seller dashboard, they appear here automatically."
+                />
+              )}
+            </div>
           </div>
         </div>
       </section>
