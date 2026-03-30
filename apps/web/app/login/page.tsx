@@ -75,14 +75,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
           {hasAnyProvider ? (
             <p className="mt-6 text-sm leading-7 text-white/70">
-              After sign-in, you&apos;ll come right back to the page you were on.
+              After sign-in, you&apos;ll come right back to the page you were
+              on.
             </p>
           ) : (
             <div className="mt-6 border border-amber-300/30 bg-amber-400/10 p-4 text-sm leading-7 text-amber-100">
               Add `AUTH_GITHUB_ID` / `AUTH_GITHUB_SECRET` and/or
-              `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` in
-              `apps/web/.env.local` and `apps/dashboard/.env.local` to enable
-              buyer sign-in.
+              `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` in `apps/web/.env.local`
+              and `apps/dashboard/.env.local` to enable buyer sign-in.
             </div>
           )}
 

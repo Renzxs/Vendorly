@@ -1,6 +1,27 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
+const orderPaymentMethod = v.union(
+  v.literal("card"),
+  v.literal("online"),
+  v.literal("cod"),
+);
+
+const orderPaymentStatus = v.union(
+  v.literal("pending"),
+  v.literal("paid"),
+  v.literal("cod_due"),
+);
+
+const orderStatus = v.union(
+  v.literal("pending"),
+  v.literal("confirmed"),
+  v.literal("preparing"),
+  v.literal("shipped"),
+  v.literal("delivered"),
+  v.literal("cancelled"),
+);
+
 export default defineSchema({
   users: defineTable({
     authUserId: v.string(),
@@ -31,11 +52,61 @@ export default defineSchema({
     title: v.string(),
     description: v.string(),
     price: v.number(),
+    isSoldOut: v.optional(v.boolean()),
     image: v.optional(v.string()),
     images: v.optional(v.array(v.string())),
     imageStorageIds: v.optional(v.array(v.id("_storage"))),
     storeId: v.id("stores"),
   }).index("by_store", ["storeId"]),
+  orders: defineTable({
+    buyerEmail: v.string(),
+    buyerId: v.string(),
+    buyerName: v.optional(v.string()),
+    itemCount: v.number(),
+    items: v.array(
+      v.object({
+        productId: v.id("products"),
+        productImage: v.optional(v.string()),
+        productTitle: v.string(),
+        quantity: v.number(),
+        unitPrice: v.number(),
+      }),
+    ),
+    orderCode: v.string(),
+    orderStatus,
+    paymentMethod: orderPaymentMethod,
+    paymentStatus: orderPaymentStatus,
+    shippingAddress: v.object({
+      addressLine1: v.string(),
+      addressLine2: v.optional(v.string()),
+      city: v.string(),
+      country: v.string(),
+      email: v.string(),
+      fullName: v.string(),
+      notes: v.optional(v.string()),
+      phone: v.string(),
+      postalCode: v.string(),
+      stateProvince: v.string(),
+    }),
+    shippingFee: v.number(),
+    statusHistory: v.array(
+      v.object({
+        at: v.number(),
+        label: v.string(),
+        orderStatus: v.optional(orderStatus),
+        paymentStatus: v.optional(orderPaymentStatus),
+      }),
+    ),
+    statusUpdatedAt: v.number(),
+    storeId: v.id("stores"),
+    storeName: v.string(),
+    subtotal: v.number(),
+    total: v.number(),
+  })
+    .index("by_buyer", ["buyerId"])
+    .index("by_store", ["storeId"])
+    .index("by_store_status", ["storeId", "orderStatus"])
+    .index("by_order_code", ["orderCode"]),
   storeFollowers: defineTable({
     storeId: v.id("stores"),
     viewerId: v.string(),

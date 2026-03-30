@@ -11,6 +11,7 @@
 import type * as chat from "../chat.js";
 import type * as lib_social from "../lib/social.js";
 import type * as lib_users from "../lib/users.js";
+import type * as orders from "../orders.js";
 import type * as products from "../products.js";
 import type * as seed from "../seed.js";
 import type * as stores from "../stores.js";
@@ -26,6 +27,7 @@ declare const fullApi: ApiFromModules<{
   chat: typeof chat;
   "lib/social": typeof lib_social;
   "lib/users": typeof lib_users;
+  orders: typeof orders;
   products: typeof products;
   seed: typeof seed;
   stores: typeof stores;

@@ -40,6 +40,7 @@ export function ProductSocialCard({
   const [error, setError] = useState<string | null>(null);
   const totalReactions =
     product.reactionCount ?? getTotalReactionCount(product.reactionCounts);
+  const isSoldOut = Boolean(product.isSoldOut);
   const resolvedStoreName =
     storeName ??
     ("store" in product ? product.store?.name : undefined) ??
@@ -77,10 +78,15 @@ export function ProductSocialCard({
           <>
             <button
               type="button"
+              disabled={isSoldOut}
               onClick={() => cart.addItem(product, resolvedStoreName)}
-              className="inline-flex items-center rounded-xl border border-slate-950 bg-slate-950 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+              className={`inline-flex items-center rounded-xl border px-3 py-2 text-sm font-medium transition ${
+                isSoldOut
+                  ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
+                  : "border-slate-950 bg-slate-950 text-white hover:bg-slate-800"
+              }`}
             >
-              Add to cart
+              {isSoldOut ? "Sold out" : "Add to cart"}
             </button>
             <button
               type="button"
@@ -117,6 +123,12 @@ export function ProductSocialCard({
               {totalReactions} total reaction{totalReactions === 1 ? "" : "s"}{" "}
               so far.
             </p>
+            {isSoldOut ? (
+              <p className="mt-2 text-sm font-medium text-rose-600">
+                This product is currently sold out. Buyers can still chat with
+                the store for restock updates.
+              </p>
+            ) : null}
           </div>
           <div className="flex flex-wrap gap-2">
             {PRODUCT_REACTION_OPTIONS.map((option) => {

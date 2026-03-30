@@ -59,6 +59,11 @@ export function ProductCard({
             : "aspect-[4/3] border-b border-slate-200",
         )}
       >
+        {product.isSoldOut ? (
+          <span className="absolute left-4 top-4 z-10 rounded-full border border-rose-200 bg-white/95 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-rose-600 backdrop-blur">
+            Sold out
+          </span>
+        ) : null}
         {currentImage ? (
           <img
             alt={product.title}
@@ -117,9 +122,16 @@ export function ProductCard({
                 {product.title}
               </h3>
             </div>
-            <span className="shrink-0 text-lg font-semibold text-slate-950">
-              {formatCurrency(product.price)}
-            </span>
+            <div className="shrink-0 text-right">
+              <span className="text-lg font-semibold text-slate-950">
+                {formatCurrency(product.price)}
+              </span>
+              {product.isSoldOut ? (
+                <p className="mt-1 text-xs font-semibold uppercase tracking-[0.22em] text-rose-500">
+                  Unavailable
+                </p>
+              ) : null}
+            </div>
           </div>
           <p className="max-w-2xl text-sm leading-6 text-slate-600 sm:text-base [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden">
             {product.description}

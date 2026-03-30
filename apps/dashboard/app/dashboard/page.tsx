@@ -1,7 +1,13 @@
 import { fetchQuery } from "convex/nextjs";
 
 import { api } from "@vendorly/convex";
-import type { ChatMessage, ChatThread, Product, Store } from "@vendorly/utils";
+import type {
+  ChatMessage,
+  ChatThread,
+  Order,
+  Product,
+  Store,
+} from "@vendorly/utils";
 
 import { DashboardShell } from "@/components/dashboard-shell";
 import { requireDashboardUser } from "@/lib/current-user";
@@ -44,6 +50,16 @@ export default async function DashboardPage({
         convexOptions,
       )
     : [];
+  const selectedStoreOrders = selectedStore
+    ? ((await fetchQuery(
+        api.orders.getOrdersByOwner,
+        {
+          ownerId: currentUser.id,
+          storeId: selectedStore._id,
+        },
+        convexOptions,
+      )) as Order[])
+    : [];
   const storeChatThreads = selectedStore
     ? ((await fetchQuery(
         api.chat.getOwnerStoreChatThreads,
@@ -78,6 +94,7 @@ export default async function DashboardPage({
       selectedChatMessages={selectedChatMessages}
       selectedChatViewerId={selectedChatViewerId}
       selectedStoreId={selectedStore?._id}
+      selectedStoreOrders={selectedStoreOrders}
       selectedStoreProducts={selectedStoreProducts as Product[]}
       storeChatThreads={storeChatThreads}
       stores={stores}

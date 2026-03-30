@@ -1,6 +1,15 @@
 export type LayoutType = "grid" | "list";
 export type ProductReaction = "love" | "fire" | "wow";
 export type ChatSender = "buyer" | "seller";
+export type OrderPaymentMethod = "card" | "cod" | "online";
+export type OrderPaymentStatus = "cod_due" | "paid" | "pending";
+export type OrderStatus =
+  | "cancelled"
+  | "confirmed"
+  | "delivered"
+  | "pending"
+  | "preparing"
+  | "shipped";
 
 export interface VendorlyUser {
   _id: string;
@@ -37,6 +46,7 @@ export interface Product {
   title: string;
   description: string;
   price: number;
+  isSoldOut?: boolean;
   image?: string;
   images?: string[];
   imageStorageIds?: string[];
@@ -62,6 +72,20 @@ export interface CartItem {
   title: string;
 }
 
+export interface CheckoutFormValues {
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  country: string;
+  email: string;
+  fullName: string;
+  notes: string;
+  paymentMethod: OrderPaymentMethod;
+  phone: string;
+  postalCode: string;
+  stateProvince: string;
+}
+
 export interface ChatMessage {
   _id: string;
   _creationTime?: number;
@@ -85,6 +109,57 @@ export interface ChatThread {
   viewerName?: string;
 }
 
+export interface OrderLineItem {
+  productId: string;
+  productImage?: string;
+  productTitle: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+export interface OrderTimelineEvent {
+  at: number;
+  label: string;
+  orderStatus?: OrderStatus;
+  paymentStatus?: OrderPaymentStatus;
+}
+
+export interface ShippingAddress {
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  country: string;
+  email: string;
+  fullName: string;
+  notes?: string;
+  phone: string;
+  postalCode: string;
+  stateProvince: string;
+}
+
+export interface Order {
+  _id: string;
+  _creationTime?: number;
+  buyerEmail: string;
+  buyerId: string;
+  buyerName?: string;
+  itemCount: number;
+  items: OrderLineItem[];
+  orderCode: string;
+  orderStatus: OrderStatus;
+  paymentMethod: OrderPaymentMethod;
+  paymentStatus: OrderPaymentStatus;
+  shippingAddress: ShippingAddress;
+  shippingFee: number;
+  statusHistory: OrderTimelineEvent[];
+  statusUpdatedAt: number;
+  store?: Pick<Store, "_id" | "name" | "slug" | "themeColor">;
+  storeId: string;
+  storeName: string;
+  subtotal: number;
+  total: number;
+}
+
 export interface StoreFormValues {
   name: string;
   slug: string;
@@ -105,4 +180,5 @@ export interface ProductFormValues {
   description: string;
   price: string;
   imagesText: string;
+  isSoldOut: boolean;
 }

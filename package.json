@@ -18,6 +18,9 @@
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint"
   },
+  "dependencies": {
+    "convex": "^1.18.2"
+  },
   "devDependencies": {
     "eslint": "^8.57.1",
     "eslint-config-next": "^15.5.14",

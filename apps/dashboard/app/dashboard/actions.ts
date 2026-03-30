@@ -10,6 +10,8 @@ import {
   parseImageUrls,
   slugify,
   type LayoutType,
+  type OrderPaymentStatus,
+  type OrderStatus,
 } from "@vendorly/utils";
 
 import { requireDashboardUser } from "@/lib/current-user";
@@ -42,6 +44,7 @@ type SaveProductInput = {
   description: string;
   imagesText: string;
   imageStorageIds: string[];
+  isSoldOut: boolean;
   price: string;
   productId?: string;
   storeId: string;
@@ -53,6 +56,13 @@ type SendSellerChatReplyInput = {
   body: string;
   storeId: string;
   viewerId: string;
+};
+
+type UpdateOrderInput = {
+  orderId: string;
+  orderStatus?: OrderStatus;
+  paymentStatus?: OrderPaymentStatus;
+  storeId: string;
 };
 
 function getErrorMessage(error: unknown) {
@@ -168,6 +178,7 @@ export async function saveProductAction(
       images: images.length > 0 ? images : undefined,
       imageStorageIds:
         input.imageStorageIds.length > 0 ? input.imageStorageIds : undefined,
+      isSoldOut: input.isSoldOut,
       ownerId: currentUser.id,
       price,
       title: input.title.trim(),
@@ -279,6 +290,54 @@ export async function sendSellerChatReplyAction(
     return {
       success: true,
       message: "Reply sent.",
+      storeId: input.storeId,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: getErrorMessage(error),
+    };
+  }
+}
+
+export async function updateOrderAction(
+  input: UpdateOrderInput,
+): Promise<DashboardActionResult> {
+  try {
+    const currentUser = await requireDashboardUser();
+    const convexOptions = getConvexServerOptions();
+
+    if (!input.orderId) {
+      return {
+        success: false,
+        message: "Choose an order first.",
+      };
+    }
+
+    if (!input.orderStatus && !input.paymentStatus) {
+      return {
+        success: false,
+        message: "Select an order update first.",
+      };
+    }
+
+    await fetchMutation(
+      api.orders.updateOrderStatus,
+      {
+        orderId: input.orderId,
+        orderStatus: input.orderStatus,
+        ownerId: currentUser.id,
+        paymentStatus: input.paymentStatus,
+      },
+      convexOptions,
+    );
+
+    revalidatePath("/dashboard");
+    revalidatePath("/orders");
+
+    return {
+      success: true,
+      message: "Order updated.",
       storeId: input.storeId,
     };
   } catch (error) {

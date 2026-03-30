@@ -87,6 +87,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
           return;
         }
 
+        if (product.isSoldOut) {
+          return;
+        }
+
         if (!authUserId) {
           router.push(`/login?callbackUrl=${encodeURIComponent(currentPath)}`);
           return;

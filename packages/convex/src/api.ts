@@ -8,6 +8,12 @@ export const api = anyApi as {
     sendSellerStoreMessage: any;
     sendViewerStoreMessage: any;
   };
+  orders: {
+    createOrdersFromCheckout: any;
+    getOrdersByOwner: any;
+    getViewerOrders: any;
+    updateOrderStatus: any;
+  };
   products: {
     createProduct: any;
     generateProductImageUploadUrl: any;

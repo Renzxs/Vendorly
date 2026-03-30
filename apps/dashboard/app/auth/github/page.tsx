@@ -1,6 +1,7 @@
+import { authProviderAvailability } from "@/auth";
+import { OAuthAutoSubmitForm } from "@/components/oauth-auto-submit-form";
+import { signInWithGitHubAction } from "@/lib/auth-actions";
 import { redirect } from "next/navigation";
-
-import { authProviderAvailability, signIn } from "@/auth";
 
 type OAuthStartPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -22,8 +23,11 @@ export default async function DashboardGitHubStartPage({
   }
 
   const resolvedSearchParams = await searchParams;
-
-  await signIn("github", {
-    redirectTo: getCallbackUrl(resolvedSearchParams.callbackUrl),
-  });
+  return (
+    <OAuthAutoSubmitForm
+      action={signInWithGitHubAction}
+      callbackUrl={getCallbackUrl(resolvedSearchParams.callbackUrl)}
+      providerLabel="GitHub"
+    />
+  );
 }

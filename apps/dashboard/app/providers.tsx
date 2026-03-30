@@ -2,10 +2,12 @@
 
 import type { ReactNode } from "react";
 
+import { VendorlyConvexProvider } from "@vendorly/convex";
+
 type ProvidersProps = {
   children: ReactNode;
 };
 
 export function Providers({ children }: ProvidersProps) {
-  return <>{children}</>;
+  return <VendorlyConvexProvider>{children}</VendorlyConvexProvider>;
 }

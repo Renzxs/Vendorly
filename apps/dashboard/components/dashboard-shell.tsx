@@ -8,8 +8,10 @@ import type {
   TextareaHTMLAttributes,
 } from "react";
 import { useEffect, useMemo, useState, useTransition } from "react";
+import { useQuery } from "convex/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
+import { api } from "@vendorly/convex";
 import {
   LayoutSwitcher,
   ProductCard,
@@ -22,11 +24,17 @@ import {
   cn,
   type ChatMessage,
   type ChatThread,
+  formatCurrency,
+  getOrderStatusLabel,
+  getPaymentStatusLabel,
   getProductImages,
   getStoreSocialLinks,
   MARKETPLACE_URL,
   getInitials,
   normalizeThemeColor,
+  type Order,
+  type OrderPaymentStatus,
+  type OrderStatus,
   parseImageUrls,
   slugify,
   type Product,
@@ -41,6 +49,7 @@ import {
   generateProductImageUploadUrlAction,
   seedDemoDataAction,
   sendSellerChatReplyAction,
+  updateOrderAction,
   type DashboardActionResult,
 } from "@/app/dashboard/actions";
 import { signOutAction } from "@/lib/auth-actions";
@@ -60,6 +69,7 @@ type DashboardShellProps = {
   selectedChatMessages: ChatMessage[];
   selectedChatViewerId?: string;
   selectedStoreId?: string;
+  selectedStoreOrders: Order[];
   selectedStoreProducts: Product[];
   storeChatThreads: ChatThread[];
   stores: Store[];
@@ -253,11 +263,83 @@ function MetricCard({ label, value }: { label: string; value: ReactNode }) {
   );
 }
 
+function formatOrderTimestamp(value?: number) {
+  if (!value) {
+    return "Just now";
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(value);
+}
+
+function getOrderStatusClasses(status: OrderStatus) {
+  if (status === "delivered") {
+    return "border-emerald-200 bg-emerald-50 text-emerald-700";
+  }
+
+  if (status === "cancelled") {
+    return "border-rose-200 bg-rose-50 text-rose-700";
+  }
+
+  if (status === "shipped") {
+    return "border-sky-200 bg-sky-50 text-sky-700";
+  }
+
+  return "border-amber-200 bg-amber-50 text-amber-700";
+}
+
+function getPaymentStatusClasses(status: OrderPaymentStatus) {
+  if (status === "paid") {
+    return "border-emerald-200 bg-emerald-50 text-emerald-700";
+  }
+
+  if (status === "cod_due") {
+    return "border-violet-200 bg-violet-50 text-violet-700";
+  }
+
+  return "border-amber-200 bg-amber-50 text-amber-700";
+}
+
+function getNextOrderStep(status: OrderStatus) {
+  if (status === "pending") {
+    return {
+      label: "Confirm order",
+      nextStatus: "confirmed" as const,
+    };
+  }
+
+  if (status === "confirmed") {
+    return {
+      label: "Start preparing",
+      nextStatus: "preparing" as const,
+    };
+  }
+
+  if (status === "preparing") {
+    return {
+      label: "Mark shipped",
+      nextStatus: "shipped" as const,
+    };
+  }
+
+  if (status === "shipped") {
+    return {
+      label: "Mark delivered",
+      nextStatus: "delivered" as const,
+    };
+  }
+
+  return null;
+}
+
 export function DashboardShell({
   currentUser,
   selectedChatMessages,
   selectedChatViewerId,
   selectedStoreId,
+  selectedStoreOrders,
   selectedStoreProducts,
   storeChatThreads,
   stores,
@@ -277,6 +359,7 @@ export function DashboardShell({
   const [submittingStore, setSubmittingStore] = useState(false);
   const [submittingProduct, setSubmittingProduct] = useState(false);
   const [submittingReply, setSubmittingReply] = useState(false);
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const [sellerReply, setSellerReply] = useState("");
   const [uploadedImages, setUploadedImages] = useState<UploadedImagePreview[]>(
     [],
@@ -286,12 +369,43 @@ export function DashboardShell({
     () => stores.find((store) => store._id === selectedStoreId),
     [selectedStoreId, stores],
   );
+  const requestedChatViewerId = searchParams.get("chat") ?? undefined;
+  const liveStoreChatThreads = useQuery(
+    api.chat.getOwnerStoreChatThreads,
+    selectedStore
+      ? {
+          ownerId: currentUser.id,
+          storeId: selectedStore._id,
+        }
+      : "skip",
+  ) as ChatThread[] | undefined;
+  const resolvedStoreChatThreads = liveStoreChatThreads ?? storeChatThreads;
+  const activeChatViewerId =
+    requestedChatViewerId &&
+    resolvedStoreChatThreads.some(
+      (thread) => thread.viewerId === requestedChatViewerId,
+    )
+      ? requestedChatViewerId
+      : (resolvedStoreChatThreads[0]?.viewerId ?? selectedChatViewerId);
+  const liveSelectedChatMessages = useQuery(
+    api.chat.getOwnerStoreChatMessages,
+    selectedStore && activeChatViewerId
+      ? {
+          ownerId: currentUser.id,
+          storeId: selectedStore._id,
+          viewerId: activeChatViewerId,
+        }
+      : "skip",
+  ) as ChatMessage[] | undefined;
+  const resolvedSelectedChatMessages =
+    liveSelectedChatMessages ??
+    (activeChatViewerId === selectedChatViewerId ? selectedChatMessages : []);
   const selectedChatThread = useMemo(
     () =>
-      storeChatThreads.find(
-        (thread) => thread.viewerId === selectedChatViewerId,
+      resolvedStoreChatThreads.find(
+        (thread) => thread.viewerId === activeChatViewerId,
       ),
-    [selectedChatViewerId, storeChatThreads],
+    [activeChatViewerId, resolvedStoreChatThreads],
   );
   const previewThemeColor = normalizeThemeColor(storeForm.themeColor);
   const previewSlug = slugify(storeForm.slug || storeForm.name);
@@ -367,6 +481,7 @@ export function DashboardShell({
       description: product.description,
       price: String(product.price),
       imagesText: externalImageUrls.join("\n"),
+      isSoldOut: Boolean(product.isSoldOut),
     });
     replaceUploadedImages(
       (product.imageStorageIds ?? []).map((storageId, index) => ({
@@ -381,7 +496,7 @@ export function DashboardShell({
 
   useEffect(() => {
     setSellerReply("");
-  }, [selectedChatViewerId]);
+  }, [activeChatViewerId]);
 
   function clearUploadedImages() {
     replaceUploadedImages([]);
@@ -474,7 +589,7 @@ export function DashboardShell({
       : pathname;
 
     startNavigationTransition(() => {
-      router.replace(nextUrl);
+      router.replace(nextUrl, { scroll: false });
     });
   }
 
@@ -496,7 +611,7 @@ export function DashboardShell({
       : pathname;
 
     startNavigationTransition(() => {
-      router.replace(nextUrl);
+      router.replace(nextUrl, { scroll: false });
     });
   }
 
@@ -573,6 +688,7 @@ export function DashboardShell({
         description: productForm.description,
         imageStorageIds: uploadedImages.map((image) => image.storageId),
         imagesText: productForm.imagesText,
+        isSoldOut: productForm.isSoldOut,
         price: productForm.price,
         productId: selectedProductId || undefined,
         storeId: selectedStore._id,
@@ -603,7 +719,7 @@ export function DashboardShell({
       return;
     }
 
-    if (!selectedChatViewerId) {
+    if (!activeChatViewerId) {
       setStatus({
         kind: "error",
         message: "Select a conversation before replying.",
@@ -618,7 +734,7 @@ export function DashboardShell({
       const result = await sendSellerChatReplyAction({
         body: sellerReply,
         storeId: selectedStore._id,
-        viewerId: selectedChatViewerId,
+        viewerId: activeChatViewerId,
       });
 
       if (result.success) {
@@ -628,6 +744,36 @@ export function DashboardShell({
       await applyActionResult(result);
     } finally {
       setSubmittingReply(false);
+    }
+  }
+
+  async function handleOrderUpdate(input: {
+    orderId: string;
+    orderStatus?: OrderStatus;
+    paymentStatus?: OrderPaymentStatus;
+  }) {
+    if (!selectedStore) {
+      setStatus({
+        kind: "error",
+        message: "Choose a store before updating orders.",
+      });
+      return;
+    }
+
+    setUpdatingOrderId(input.orderId);
+    setStatus(null);
+
+    try {
+      const result = await updateOrderAction({
+        orderId: input.orderId,
+        orderStatus: input.orderStatus,
+        paymentStatus: input.paymentStatus,
+        storeId: selectedStore._id,
+      });
+
+      await applyActionResult(result);
+    } finally {
+      setUpdatingOrderId(null);
     }
   }
 
@@ -776,7 +922,7 @@ export function DashboardShell({
                 />
                 <MetricCard
                   label="Inbox threads"
-                  value={selectedStore ? storeChatThreads.length : 0}
+                  value={selectedStore ? resolvedStoreChatThreads.length : 0}
                 />
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
@@ -1119,6 +1265,44 @@ export function DashboardShell({
                       </Field>
                     </div>
 
+                    <Field label="Availability">
+                      <label className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+                        <div>
+                          <p className="text-sm font-medium text-slate-950">
+                            Mark as sold out
+                          </p>
+                          <p className="mt-1 text-sm leading-6 text-slate-600">
+                            Buyers can still view the product, but checkout and
+                            add-to-cart will be disabled.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={productForm.isSoldOut}
+                          onClick={() =>
+                            setProductForm((current) => ({
+                              ...current,
+                              isSoldOut: !current.isSoldOut,
+                            }))
+                          }
+                          className={`relative inline-flex h-8 w-14 shrink-0 items-center rounded-full border transition ${
+                            productForm.isSoldOut
+                              ? "border-rose-300 bg-rose-500"
+                              : "border-slate-300 bg-white"
+                          }`}
+                        >
+                          <span
+                            className={`inline-block h-6 w-6 rounded-full bg-white shadow-sm transition ${
+                              productForm.isSoldOut
+                                ? "translate-x-7"
+                                : "translate-x-1"
+                            }`}
+                          />
+                        </button>
+                      </label>
+                    </Field>
+
                     <Field label="Attach image files">
                       <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4">
                         <input
@@ -1257,6 +1441,258 @@ export function DashboardShell({
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                      Orders
+                    </p>
+                    <p className="mt-2 text-sm text-slate-600">
+                      {selectedStore
+                        ? `Fulfillment and payment updates for ${selectedStore.name}`
+                        : "Choose a store to manage incoming orders"}
+                    </p>
+                  </div>
+                  {selectedStore ? (
+                    <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                      {selectedStoreOrders.length} order
+                      {selectedStoreOrders.length === 1 ? "" : "s"}
+                    </span>
+                  ) : null}
+                </div>
+
+                <div className="mt-6 space-y-4">
+                  {!selectedStore ? (
+                    <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+                      <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+                        No store selected
+                      </h3>
+                      <p className="mt-3 text-sm leading-7 text-slate-600">
+                        Pick a store from the sidebar to review and update
+                        orders.
+                      </p>
+                    </div>
+                  ) : selectedStoreOrders.length === 0 ? (
+                    <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+                      <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+                        No orders yet
+                      </h3>
+                      <p className="mt-3 text-sm leading-7 text-slate-600">
+                        Orders placed through checkout will appear here so you
+                        can confirm payment, prepare shipments, and mark
+                        deliveries.
+                      </p>
+                    </div>
+                  ) : (
+                    selectedStoreOrders.map((order) => {
+                      const nextStep =
+                        order.paymentMethod === "online" &&
+                        order.paymentStatus !== "paid" &&
+                        order.orderStatus === "pending"
+                          ? null
+                          : getNextOrderStep(order.orderStatus);
+                      const canCancel =
+                        order.orderStatus !== "cancelled" &&
+                        order.orderStatus !== "delivered";
+                      const canMarkPaid = order.paymentStatus !== "paid";
+                      const isUpdating = updatingOrderId === order._id;
+
+                      return (
+                        <div
+                          key={order._id}
+                          className="rounded-[2rem] border border-slate-200 bg-slate-50 p-5"
+                        >
+                          <div className="flex flex-col gap-4 border-b border-slate-200 pb-4 lg:flex-row lg:items-start lg:justify-between">
+                            <div>
+                              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                                Order {order.orderCode}
+                              </p>
+                              <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+                                {order.shippingAddress.fullName}
+                              </h3>
+                              <p className="mt-2 text-sm text-slate-600">
+                                Placed{" "}
+                                {formatOrderTimestamp(order._creationTime)}
+                              </p>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              <span
+                                className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] ${getOrderStatusClasses(order.orderStatus)}`}
+                              >
+                                {getOrderStatusLabel(order.orderStatus)}
+                              </span>
+                              <span
+                                className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] ${getPaymentStatusClasses(order.paymentStatus)}`}
+                              >
+                                {getPaymentStatusLabel(order.paymentStatus)}
+                              </span>
+                              <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                                {order.paymentMethod}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
+                            <div className="space-y-4">
+                              <div className="rounded-3xl border border-slate-200 bg-white p-4">
+                                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                                  Items
+                                </p>
+                                <div className="mt-4 space-y-3">
+                                  {order.items.map((item) => (
+                                    <div
+                                      key={`${order._id}-${item.productId}`}
+                                      className="flex items-center justify-between gap-4 text-sm text-slate-600"
+                                    >
+                                      <div className="min-w-0">
+                                        <p className="font-medium text-slate-950">
+                                          {item.productTitle}
+                                        </p>
+                                        <p className="mt-1">
+                                          Qty {item.quantity}
+                                        </p>
+                                      </div>
+                                      <span className="shrink-0 font-medium text-slate-950">
+                                        {formatCurrency(
+                                          item.unitPrice * item.quantity,
+                                        )}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <div className="rounded-3xl border border-slate-200 bg-white p-4">
+                                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                                  Recent tracking updates
+                                </p>
+                                <div className="mt-4 space-y-3">
+                                  {order.statusHistory
+                                    .slice(-3)
+                                    .map((entry, index) => (
+                                      <div
+                                        key={`${order._id}-${entry.at}-${index}`}
+                                      >
+                                        <p className="text-sm font-medium text-slate-950">
+                                          {entry.label}
+                                        </p>
+                                        <p className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-400">
+                                          {formatOrderTimestamp(entry.at)}
+                                        </p>
+                                      </div>
+                                    ))}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="space-y-4">
+                              <div className="rounded-3xl border border-slate-200 bg-white p-4">
+                                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                                  Delivery
+                                </p>
+                                <div className="mt-4 space-y-2 text-sm leading-6 text-slate-600">
+                                  <p>{order.shippingAddress.phone}</p>
+                                  <p>{order.shippingAddress.email}</p>
+                                  <p>{order.shippingAddress.addressLine1}</p>
+                                  {order.shippingAddress.addressLine2 ? (
+                                    <p>{order.shippingAddress.addressLine2}</p>
+                                  ) : null}
+                                  <p>
+                                    {order.shippingAddress.city},{" "}
+                                    {order.shippingAddress.stateProvince}{" "}
+                                    {order.shippingAddress.postalCode}
+                                  </p>
+                                  <p>{order.shippingAddress.country}</p>
+                                </div>
+                              </div>
+
+                              <div className="rounded-3xl border border-slate-200 bg-white p-4">
+                                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                                  Totals
+                                </p>
+                                <div className="mt-4 space-y-2 text-sm text-slate-600">
+                                  <div className="flex items-center justify-between gap-4">
+                                    <span>Subtotal</span>
+                                    <span>
+                                      {formatCurrency(order.subtotal)}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-4">
+                                    <span>Shipping</span>
+                                    <span>
+                                      {order.shippingFee === 0
+                                        ? "Free"
+                                        : formatCurrency(order.shippingFee)}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-4 border-t border-slate-200 pt-3 font-semibold text-slate-950">
+                                    <span>Total</span>
+                                    <span>{formatCurrency(order.total)}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="mt-5 flex flex-wrap gap-3">
+                            {canMarkPaid ? (
+                              <button
+                                type="button"
+                                disabled={isUpdating}
+                                onClick={() =>
+                                  handleOrderUpdate({
+                                    orderId: order._id,
+                                    paymentStatus: "paid",
+                                  })
+                                }
+                                className="inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900 transition hover:border-slate-300"
+                              >
+                                Mark paid
+                              </button>
+                            ) : null}
+                            {nextStep ? (
+                              <button
+                                type="button"
+                                disabled={isUpdating}
+                                onClick={() =>
+                                  handleOrderUpdate({
+                                    orderId: order._id,
+                                    orderStatus: nextStep.nextStatus,
+                                  })
+                                }
+                                className="inline-flex rounded-xl border border-slate-950 bg-slate-950 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
+                              >
+                                {nextStep.label}
+                              </button>
+                            ) : null}
+                            {canCancel ? (
+                              <button
+                                type="button"
+                                disabled={isUpdating}
+                                onClick={() =>
+                                  handleOrderUpdate({
+                                    orderId: order._id,
+                                    orderStatus: "cancelled",
+                                  })
+                                }
+                                className="inline-flex rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-medium text-rose-700 transition hover:bg-rose-100"
+                              >
+                                Cancel order
+                              </button>
+                            ) : null}
+                            {isUpdating ? (
+                              <span className="inline-flex items-center text-sm text-slate-500">
+                                Updating order...
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </Panel>
+
+              <Panel>
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
                       Customer inbox
                     </p>
                     <p className="mt-2 text-sm text-slate-600">
@@ -1267,8 +1703,8 @@ export function DashboardShell({
                   </div>
                   {selectedStore ? (
                     <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-                      {storeChatThreads.length} thread
-                      {storeChatThreads.length === 1 ? "" : "s"}
+                      {resolvedStoreChatThreads.length} thread
+                      {resolvedStoreChatThreads.length === 1 ? "" : "s"}
                     </span>
                   ) : null}
                 </div>
@@ -1284,7 +1720,7 @@ export function DashboardShell({
                         and reply as the seller.
                       </p>
                     </div>
-                  ) : storeChatThreads.length === 0 ? (
+                  ) : resolvedStoreChatThreads.length === 0 ? (
                     <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
                       <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
                         No chats yet
@@ -1297,9 +1733,8 @@ export function DashboardShell({
                   ) : (
                     <div className="grid gap-6 xl:grid-cols-[260px_minmax(0,1fr)]">
                       <div className="space-y-3">
-                        {storeChatThreads.map((thread) => {
-                          const active =
-                            thread.viewerId === selectedChatViewerId;
+                        {resolvedStoreChatThreads.map((thread) => {
+                          const active = thread.viewerId === activeChatViewerId;
 
                           return (
                             <button
@@ -1365,20 +1800,20 @@ export function DashboardShell({
                           </p>
                           <h3 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
                             {selectedChatThread?.viewerName ||
-                              (selectedChatViewerId
-                                ? `Guest ${selectedChatViewerId.slice(0, 4)}`
+                              (activeChatViewerId
+                                ? `Guest ${activeChatViewerId.slice(0, 4)}`
                                 : "Select a conversation")}
                           </h3>
                           <p className="mt-2 text-sm leading-7 text-slate-600">
                             Reply from your seller dashboard. New buyer messages
-                            appear here after refresh and update live on the
+                            appear here instantly and stay in sync with the
                             buyer side.
                           </p>
                         </div>
 
-                        {selectedChatMessages.length > 0 ? (
+                        {resolvedSelectedChatMessages.length > 0 ? (
                           <div className="max-h-[28rem] space-y-4 overflow-y-auto bg-slate-50 px-5 py-5">
-                            {selectedChatMessages.map((message) => (
+                            {resolvedSelectedChatMessages.map((message) => (
                               <div
                                 key={message._id}
                                 className={`max-w-[88%] rounded-3xl border px-4 py-3 text-sm leading-7 ${
@@ -1457,7 +1892,7 @@ export function DashboardShell({
                             disabled={
                               submittingReply ||
                               !selectedStore ||
-                              !selectedChatViewerId ||
+                              !activeChatViewerId ||
                               !sellerReply.trim()
                             }
                             className="mt-4 inline-flex w-full justify-center rounded-xl border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"

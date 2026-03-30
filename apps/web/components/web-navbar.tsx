@@ -19,6 +19,7 @@ export function WebNavbar({ dashboardUrl }: { dashboardUrl: string }) {
         { href: "/", label: "Shop" },
         { href: "/#stores", label: "Stores" },
         { href: "/#products", label: "Products" },
+        { href: "/orders", label: "Orders" },
         { href: "/feed", label: "Feed" },
       ]}
       rightAccessory={

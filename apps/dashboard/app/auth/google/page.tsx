@@ -1,6 +1,7 @@
+import { authProviderAvailability } from "@/auth";
+import { OAuthAutoSubmitForm } from "@/components/oauth-auto-submit-form";
+import { signInWithGoogleAction } from "@/lib/auth-actions";
 import { redirect } from "next/navigation";
-
-import { authProviderAvailability, signIn } from "@/auth";
 
 type OAuthStartPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -22,8 +23,11 @@ export default async function DashboardGoogleStartPage({
   }
 
   const resolvedSearchParams = await searchParams;
-
-  await signIn("google", {
-    redirectTo: getCallbackUrl(resolvedSearchParams.callbackUrl),
-  });
+  return (
+    <OAuthAutoSubmitForm
+      action={signInWithGoogleAction}
+      callbackUrl={getCallbackUrl(resolvedSearchParams.callbackUrl)}
+      providerLabel="Google"
+    />
+  );
 }

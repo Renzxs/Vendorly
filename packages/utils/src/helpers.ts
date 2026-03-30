@@ -1,5 +1,12 @@
-import { DEFAULT_THEME_COLOR, PRODUCT_REACTION_OPTIONS } from "./constants";
-import type { ProductReaction } from "./types";
+import {
+  DEFAULT_THEME_COLOR,
+  ORDER_FREE_SHIPPING_THRESHOLD,
+  ORDER_PAYMENT_STATUS_LABELS,
+  ORDER_STANDARD_SHIPPING_FEE,
+  ORDER_STATUS_OPTIONS,
+  PRODUCT_REACTION_OPTIONS,
+} from "./constants";
+import type { OrderPaymentStatus, OrderStatus, ProductReaction } from "./types";
 
 export function cn(...values: Array<string | false | null | undefined>) {
   return values.filter(Boolean).join(" ");
@@ -11,6 +18,16 @@ export function formatCurrency(value: number) {
     currency: "USD",
     maximumFractionDigits: 2,
   }).format(value);
+}
+
+export function calculateShippingFee(subtotal: number) {
+  if (subtotal <= 0) {
+    return 0;
+  }
+
+  return subtotal >= ORDER_FREE_SHIPPING_THRESHOLD
+    ? 0
+    : ORDER_STANDARD_SHIPPING_FEE;
 }
 
 export function slugify(value: string) {
@@ -125,4 +142,15 @@ export function getTotalReactionCount(
     (total, option) => total + (reactionCounts?.[option.value] ?? 0),
     0,
   );
+}
+
+export function getOrderStatusLabel(status: OrderStatus) {
+  return (
+    ORDER_STATUS_OPTIONS.find((option) => option.value === status)?.label ??
+    status
+  );
+}
+
+export function getPaymentStatusLabel(status: OrderPaymentStatus) {
+  return ORDER_PAYMENT_STATUS_LABELS[status] ?? status;
 }
