@@ -1,10 +1,8 @@
 # Vendorly
 
-Vendorly is a storefront-first marketplace MVP built as a Turborepo monorepo with Next.js, Convex, TypeScript, and Tailwind CSS.
+Vendorly is a storefront-first social commerce marketplace that lets independent sellers launch branded online stores inside a shared marketplace. Buyers can discover products, follow favorite storefronts, react to new drops, chat with sellers, save their cart, and track orders, while sellers manage branding, catalog, conversations, and order activity from a dedicated dashboard.
 
-Buyers can browse the marketplace, explore seller storefronts, and view products. Sellers can manage their store branding, layout, and product catalog from a dedicated dashboard.
-
-The latest version includes OAuth sign-in with Google or GitHub for sellers, supports multiple stores per user, and keeps storefront browsing powered by Convex realtime queries.
+The project is built as a Turborepo monorepo with Next.js, Convex, TypeScript, and Tailwind CSS, with realtime marketplace data powered by Convex queries and mutations.
 
 ## Tech stack
 
@@ -114,19 +112,19 @@ The latest version includes OAuth sign-in with Google or GitHub for sellers, sup
 └── turbo.json
 ```
 
-## Included MVP features
+## Included features
 
-- Marketplace homepage with featured stores and products
-- Dynamic seller storefronts at `/store/[slug]`
-- Seller dashboard flow at `/dashboard`
-- OAuth seller sign-in with Google and GitHub
-- Multiple stores per authenticated user
-- Store customization with theme color, banner image, and layout switching
-- Product creation and editing
+- Marketplace homepage with featured stores, product discovery, search, and store filtering
+- Dynamic seller storefronts at `/store/[slug]` with branding, follow state, and chat entry points
+- Product feed for marketplace drops and followed-store updates
+- Buyer and seller OAuth sign-in with Google and GitHub
+- Multiple stores per authenticated seller
+- Store customization with theme color, banner image, logo image, layout switching, and social links
+- Product creation, editing, sold-out states, and social reactions
+- Cart, checkout, and buyer order history/tracking
+- Seller dashboard for catalog management, customer conversations, and order workflows
 - Realtime Convex queries and modular mutations
 - Responsive shared UI components in `packages/ui`
-- Search and store filtering on the marketplace
-- Basic follow-store UI on storefronts
 - Loading and empty states for both buyer and seller experiences
 
 ## Convex data model

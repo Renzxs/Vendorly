@@ -1,5 +1,6 @@
 {
   "name": "vendorly",
+  "description": "Storefront-first social commerce marketplace with branded seller storefronts, realtime buyer discovery, chat, and order management.",
   "private": true,
   "packageManager": "npm@10.9.0",
   "engines": {
