@@ -227,6 +227,14 @@ AUTH_GOOGLE_ID=your_google_oauth_client_id
 AUTH_GOOGLE_SECRET=your_google_oauth_client_secret
 ```
 
+For backend Discord alerts, add this to `packages/convex/.env.local`:
+
+```bash
+DISCORD_WEBHOOK_URL=your_discord_webhook_url
+```
+
+For hosted deployments, set `DISCORD_WEBHOOK_URL` on the Convex deployment as well, since these notifications run from Convex rather than Vercel.
+
 6. For local OAuth callbacks, register:
 
 - `http://localhost:3001/api/auth/callback/github`

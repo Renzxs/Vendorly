@@ -1,3 +1,6 @@
+import type { Id } from "../_generated/dataModel";
+import type { MutationCtx } from "../_generated/server";
+
 type SyncUserInput = {
   authUserId: string;
   email: string;
@@ -5,12 +8,18 @@ type SyncUserInput = {
   name?: string;
 };
 
-export async function syncUserRecord(ctx: any, input: SyncUserInput) {
+type SyncUserResult = {
+  userId: Id<"users">;
+  wasCreated: boolean;
+};
+
+export async function syncUserRecord(
+  ctx: MutationCtx,
+  input: SyncUserInput,
+): Promise<SyncUserResult> {
   const existingUser = await ctx.db
     .query("users")
-    .withIndex("by_auth_user_id", (query: any) =>
-      query.eq("authUserId", input.authUserId),
-    )
+    .withIndex("by_auth_user_id", (query) => query.eq("authUserId", input.authUserId))
     .unique();
 
   if (existingUser) {
@@ -20,9 +29,14 @@ export async function syncUserRecord(ctx: any, input: SyncUserInput) {
       name: input.name,
     });
 
-    return existingUser._id;
+    return {
+      userId: existingUser._id,
+      wasCreated: false,
+    };
   }
 
-  return await ctx.db.insert("users", input);
+  return {
+    userId: await ctx.db.insert("users", input),
+    wasCreated: true,
+  };
 }
-

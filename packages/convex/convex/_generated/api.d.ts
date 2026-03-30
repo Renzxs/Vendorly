@@ -9,6 +9,7 @@
  */
 
 import type * as chat from "../chat.js";
+import type * as discord from "../discord.js";
 import type * as lib_social from "../lib/social.js";
 import type * as lib_users from "../lib/users.js";
 import type * as orders from "../orders.js";
@@ -25,6 +26,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   chat: typeof chat;
+  discord: typeof discord;
   "lib/social": typeof lib_social;
   "lib/users": typeof lib_users;
   orders: typeof orders;
