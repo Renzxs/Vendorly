@@ -9,6 +9,7 @@ import type {
 } from "react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useQuery } from "convex/react";
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { api } from "@vendorly/convex";
@@ -126,63 +127,92 @@ function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
 
 function StoreListCard({
   active,
-  onClick,
+  onSelect,
   store,
 }: {
   active: boolean;
-  onClick: () => void;
+  onSelect: () => void;
   store: Store;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
+    <div
       className={`w-full rounded-2xl border p-4 text-left transition ${
         active
           ? "border-slate-950 bg-slate-950 text-white shadow-sm"
           : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
       }`}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          {store.logoImage ? (
-            <img
-              alt={`${store.name} logo`}
-              className="h-12 w-12 rounded-xl border border-white/10 object-cover"
-              src={store.logoImage}
-            />
-          ) : (
-            <div
-              className={`inline-flex h-11 w-11 items-center justify-center rounded-xl border text-sm font-semibold ${
-                active ? "bg-white/15 text-white" : "text-white"
-              }`}
-              style={active ? undefined : { backgroundColor: store.themeColor }}
-            >
-              {getInitials(store.name)}
-            </div>
-          )}
-          <p className="min-w-0 text-lg font-semibold tracking-tight [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">
-            {store.name}
-          </p>
+      <button
+        type="button"
+        onClick={onSelect}
+        className="w-full text-left"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            {store.logoImage ? (
+              <img
+                alt={`${store.name} logo`}
+                className="h-12 w-12 rounded-xl border border-white/10 object-cover"
+                src={store.logoImage}
+              />
+            ) : (
+              <div
+                className={`inline-flex h-11 w-11 items-center justify-center rounded-xl border text-sm font-semibold ${
+                  active ? "bg-white/15 text-white" : "text-white"
+                }`}
+                style={
+                  active ? undefined : { backgroundColor: store.themeColor }
+                }
+              >
+                {getInitials(store.name)}
+              </div>
+            )}
+            <p className="min-w-0 text-lg font-semibold tracking-tight [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">
+              {store.name}
+            </p>
+          </div>
+          <span
+            className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] ${
+              active
+                ? "border border-white/15 bg-white/10 text-white/75"
+                : "border border-slate-200 bg-slate-50 text-slate-500"
+            }`}
+          >
+            {store.layoutType}
+          </span>
         </div>
-        <span
-          className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] ${
-            active
-              ? "border border-white/15 bg-white/10 text-white/75"
-              : "border border-slate-200 bg-slate-50 text-slate-500"
+        <p
+          className={`mt-4 text-sm leading-6 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden ${
+            active ? "text-white/70" : "text-slate-600"
           }`}
         >
-          {store.layoutType}
-        </span>
+          {store.description}
+        </p>
+      </button>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Link
+          href={`/dashboard/stores/${store._id}`}
+          className={`inline-flex rounded-xl px-3 py-2 text-xs font-medium transition ${
+            active
+              ? "border border-white/15 bg-white/10 text-white hover:bg-white/15"
+              : "border border-slate-200 bg-slate-50 text-slate-900 hover:border-slate-300 hover:bg-white"
+          }`}
+        >
+          View
+        </Link>
+        <Link
+          href={`/dashboard/stores/${store._id}/edit`}
+          className={`inline-flex rounded-xl px-3 py-2 text-xs font-medium transition ${
+            active
+              ? "border border-white/15 bg-white/10 text-white hover:bg-white/15"
+              : "border border-slate-200 bg-slate-50 text-slate-900 hover:border-slate-300 hover:bg-white"
+          }`}
+        >
+          Edit
+        </Link>
       </div>
-      <p
-        className={`mt-4 text-sm leading-6 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden ${
-          active ? "text-white/70" : "text-slate-600"
-        }`}
-      >
-        {store.description}
-      </p>
-    </button>
+    </div>
   );
 }
 
@@ -852,20 +882,12 @@ export function DashboardShell({
               title="Your storefronts"
               description="Pick a store to manage, or start a new one."
               action={
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStatus(null);
-                    setStoreForm(DEFAULT_STORE_FORM);
-                    setProductForm(DEFAULT_PRODUCT_FORM);
-                    setSelectedProductId(null);
-                    clearUploadedImages();
-                    navigateToStore(undefined);
-                  }}
+                <Link
+                  href="/dashboard/stores/new"
                   className="inline-flex rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
                 >
                   New store
-                </button>
+                </Link>
               }
             />
 
@@ -875,7 +897,7 @@ export function DashboardShell({
                   <StoreListCard
                     key={store._id}
                     active={selectedStoreId === store._id}
-                    onClick={() => {
+                    onSelect={() => {
                       setStatus(null);
                       navigateToStore(store._id);
                     }}

@@ -39,8 +39,9 @@ export default async function DashboardPage({
       ? resolvedSearchParams.chat
       : undefined;
 
-  const selectedStore =
-    stores.find((store) => store._id === requestedStoreId) ?? stores[0];
+  const selectedStore = requestedStoreId
+    ? stores.find((store) => store._id === requestedStoreId)
+    : undefined;
   const selectedStoreProducts = selectedStore
     ? await fetchQuery(
         api.products.getProductsByStore,
