@@ -5,8 +5,25 @@ import { v } from "convex/values";
 import { internalAction } from "./_generated/server";
 
 const webhookUsername = "Vendorly Alerts";
+const successGreen = 0x00ff00;
 
-async function postDiscordMessage(content: string) {
+type DiscordField = {
+  inline?: boolean;
+  name: string;
+  value: string;
+};
+
+type DiscordEmbed = {
+  color: number;
+  description: string;
+  fields?: DiscordField[];
+  title: string;
+};
+
+async function postDiscordMessage(args: {
+  content: string;
+  embeds?: DiscordEmbed[];
+}) {
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
 
   if (!webhookUrl) {
@@ -16,14 +33,15 @@ async function postDiscordMessage(content: string) {
     return null;
   }
 
-  const response = await fetch(`${webhookUrl}?wait=true`, {
+  const response = await fetch(webhookUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
       allowed_mentions: { parse: [] },
-      content,
+      content: args.content,
+      embeds: args.embeds,
       username: webhookUsername,
     }),
   });
@@ -49,13 +67,34 @@ export const notifyNewUser = internalAction({
     name: v.optional(v.string()),
   },
   handler: async (_ctx, args) => {
+    const userName = formatOptionalValue(args.name);
+    const content = `New user ${userName} with email ${args.email} has signed up!`;
+
     await postDiscordMessage(
-      [
-        "New user created",
-        `Name: ${formatOptionalValue(args.name)}`,
-        `Email: ${args.email}`,
-        `Auth ID: ${args.authUserId}`,
-      ].join("\n"),
+      {
+        content,
+        embeds: [
+          {
+            title: "New User Sign Up",
+            description: content,
+            color: successGreen,
+            fields: [
+              {
+                name: "User Name",
+                value: userName,
+              },
+              {
+                name: "Email",
+                value: args.email,
+              },
+              {
+                name: "Auth ID",
+                value: args.authUserId,
+              },
+            ],
+          },
+        ],
+      },
     );
 
     return null;
@@ -72,16 +111,46 @@ export const notifyNewStore = internalAction({
     storeName: v.string(),
   },
   handler: async (_ctx, args) => {
+    const ownerName = formatOptionalValue(args.ownerName);
+    const content = `New store ${args.storeName} with slug ${args.slug} was created by ${ownerName}!`;
+
     await postDiscordMessage(
-      [
-        "New store created",
-        `Store: ${args.storeName}`,
-        `Slug: ${args.slug}`,
-        `Store ID: ${args.storeId}`,
-        `Owner: ${formatOptionalValue(args.ownerName)}`,
-        `Owner email: ${args.ownerEmail}`,
-        `Owner ID: ${args.ownerId}`,
-      ].join("\n"),
+      {
+        content,
+        embeds: [
+          {
+            title: "New Store Created",
+            description: content,
+            color: successGreen,
+            fields: [
+              {
+                name: "Store Name",
+                value: args.storeName,
+              },
+              {
+                name: "Slug",
+                value: args.slug,
+              },
+              {
+                name: "Store ID",
+                value: args.storeId,
+              },
+              {
+                name: "Owner",
+                value: ownerName,
+              },
+              {
+                name: "Owner Email",
+                value: args.ownerEmail,
+              },
+              {
+                name: "Owner ID",
+                value: args.ownerId,
+              },
+            ],
+          },
+        ],
+      },
     );
 
     return null;

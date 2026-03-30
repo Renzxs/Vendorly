@@ -1,6 +1,11 @@
+import { fetchMutation } from "convex/nextjs";
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
+
+import { api } from "@vendorly/convex";
+
+import { getConvexServerOptions } from "@/lib/convex";
 
 const githubConfigured = Boolean(
   process.env.AUTH_GITHUB_ID && process.env.AUTH_GITHUB_SECRET,
@@ -48,6 +53,35 @@ if (googleConfigured) {
   );
 }
 
+async function syncAuthenticatedUser(user: {
+  email?: string | null;
+  id?: string | null;
+  image?: string | null;
+  name?: string | null;
+}) {
+  const email = user.email ?? undefined;
+  const authUserId = user.email ?? user.id ?? undefined;
+
+  if (!authUserId || !email) {
+    return;
+  }
+
+  try {
+    await fetchMutation(
+      api.users.syncUser,
+      {
+        authUserId,
+        email,
+        image: user.image ?? undefined,
+        name: user.name ?? undefined,
+      },
+      getConvexServerOptions(),
+    );
+  } catch (error) {
+    console.error("Failed to sync authenticated web user to Convex.", error);
+  }
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   pages: {
@@ -80,6 +114,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async jwt({ token, user }) {
       if (user) {
+        await syncAuthenticatedUser(user);
         token.vendorlyUserId = user.email || user.id || token.sub;
         token.vendorlyEmail = user.email || token.email || token.sub || "";
       }

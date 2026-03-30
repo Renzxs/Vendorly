@@ -37,5 +37,6 @@ export const api = anyApi as {
   users: {
     getUserByAuthUserId: any;
     getUserByEmail: any;
+    syncUser: any;
   };
 };

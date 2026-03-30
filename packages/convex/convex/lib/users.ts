@@ -1,3 +1,4 @@
+import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 
@@ -39,4 +40,21 @@ export async function syncUserRecord(
     userId: await ctx.db.insert("users", input),
     wasCreated: true,
   };
+}
+
+export async function syncUserRecordAndNotify(
+  ctx: MutationCtx,
+  input: SyncUserInput,
+): Promise<SyncUserResult> {
+  const syncedUser = await syncUserRecord(ctx, input);
+
+  if (syncedUser.wasCreated) {
+    await ctx.scheduler.runAfter(0, internal.discord.notifyNewUser, {
+      authUserId: input.authUserId,
+      email: input.email,
+      name: input.name,
+    });
+  }
+
+  return syncedUser;
 }

@@ -3,7 +3,7 @@ import { v } from "convex/values";
 
 import { internal } from "./_generated/api";
 import { getStoreFollowSummary } from "./lib/social";
-import { syncUserRecord } from "./lib/users";
+import { syncUserRecordAndNotify } from "./lib/users";
 
 export const getStores = queryGeneric({
   args: {},
@@ -79,7 +79,7 @@ export const createStore = mutationGeneric({
       throw new Error("That store slug is already taken.");
     }
 
-    const syncedUser = await syncUserRecord(ctx, {
+    await syncUserRecordAndNotify(ctx, {
       authUserId: args.ownerId,
       email: args.ownerEmail,
       image: args.ownerImage,
@@ -101,14 +101,6 @@ export const createStore = mutationGeneric({
       websiteUrl: args.websiteUrl,
       xUrl: args.xUrl,
     });
-
-    if (syncedUser.wasCreated) {
-      await ctx.scheduler.runAfter(0, internal.discord.notifyNewUser, {
-        authUserId: args.ownerId,
-        email: args.ownerEmail,
-        name: args.ownerName,
-      });
-    }
 
     await ctx.scheduler.runAfter(0, internal.discord.notifyNewStore, {
       ownerEmail: args.ownerEmail,
@@ -163,7 +155,7 @@ export const updateStore = mutationGeneric({
       throw new Error("That store slug is already in use.");
     }
 
-    const syncedUser = await syncUserRecord(ctx, {
+    await syncUserRecordAndNotify(ctx, {
       authUserId: args.ownerId,
       email: args.ownerEmail,
       image: args.ownerImage,
@@ -184,14 +176,6 @@ export const updateStore = mutationGeneric({
       websiteUrl: args.websiteUrl,
       xUrl: args.xUrl,
     });
-
-    if (syncedUser.wasCreated) {
-      await ctx.scheduler.runAfter(0, internal.discord.notifyNewUser, {
-        authUserId: args.ownerId,
-        email: args.ownerEmail,
-        name: args.ownerName,
-      });
-    }
 
     return args.storeId;
   },
