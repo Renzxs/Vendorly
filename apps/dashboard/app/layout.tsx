@@ -13,6 +13,9 @@ export const metadata: Metadata = {
     "Manage your Vendorly store branding, product catalog, and storefront presentation from one seller dashboard.",
 };
 
+const marketplaceUrl =
+  process.env.NEXT_PUBLIC_MARKETPLACE_URL ?? "http://localhost:3000";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -24,11 +27,11 @@ export default function RootLayout({
         <Providers>
           <Navbar
             badge="Vendorly admin"
-            ctaHref="http://localhost:3000"
+            ctaHref={marketplaceUrl}
             ctaLabel="View shop"
             links={[
               { href: "/dashboard", label: "Overview" },
-              { href: "http://localhost:3000", label: "Marketplace" },
+              { href: marketplaceUrl, label: "Marketplace" },
             ]}
           />
           {children}

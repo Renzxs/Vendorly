@@ -24,9 +24,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     redirect(callbackPath);
   }
 
-  const dashboardOrigin = new URL(
-    process.env.NEXT_PUBLIC_DASHBOARD_URL ?? "http://localhost:3001/dashboard",
-  ).origin;
   const marketplaceOrigin =
     process.env.NEXT_PUBLIC_MARKETPLACE_URL ?? "http://localhost:3000";
   const callbackUrl = new URL(callbackPath, marketplaceOrigin).toString();
@@ -56,7 +53,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <div className="mt-6 grid gap-3">
             {authProviderAvailability.google ? (
               <a
-                href={`${dashboardOrigin}/auth/google?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+                href={`/auth/google?callbackUrl=${encodeURIComponent(callbackUrl)}`}
                 className="inline-flex w-full justify-center border border-white bg-white px-5 py-3 text-sm font-medium text-slate-950 transition hover:bg-slate-100"
               >
                 Continue with Google
@@ -65,7 +62,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
             {authProviderAvailability.github ? (
               <a
-                href={`${dashboardOrigin}/auth/github?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+                href={`/auth/github?callbackUrl=${encodeURIComponent(callbackUrl)}`}
                 className="inline-flex w-full justify-center border border-white/15 bg-white/10 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/15"
               >
                 Continue with GitHub
