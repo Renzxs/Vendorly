@@ -152,10 +152,15 @@ export default defineSchema({
     recipientRole: notificationRecipientRole,
     title: v.string(),
     userId: v.string(),
-  }).index("by_user_id", ["userId"]),
+  })
+    .index("by_user_id", ["userId"])
+    .index("by_user_id_and_recipient_role", ["userId", "recipientRole"]),
   notificationStates: defineTable({
     lastReadAt: v.optional(v.number()),
+    recipientRole: v.optional(notificationRecipientRole),
     unreadCount: v.number(),
     userId: v.string(),
-  }).index("by_user_id", ["userId"]),
+  })
+    .index("by_user_id", ["userId"])
+    .index("by_user_id_and_recipient_role", ["userId", "recipientRole"]),
 });

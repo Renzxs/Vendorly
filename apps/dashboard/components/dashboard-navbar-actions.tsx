@@ -11,6 +11,7 @@ import { markSellerNotificationsReadAction } from "@/app/actions/notifications";
 export function DashboardNavbarActions({ userId }: { userId: string }) {
   const inbox = useQuery(api.notifications.getInbox, {
     limit: 10,
+    recipientRole: "seller",
     userId,
   }) as NotificationInbox | undefined;
 

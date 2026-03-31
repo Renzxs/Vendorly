@@ -19,11 +19,16 @@ type NotificationStateDoc = Doc<"notificationStates">;
 
 export async function getNotificationState(
   ctx: MutationCtx | QueryCtx,
-  userId: string,
+  args: {
+    recipientRole: NotificationRecipientRole;
+    userId: string;
+  },
 ): Promise<NotificationStateDoc | null> {
   return await ctx.db
     .query("notificationStates")
-    .withIndex("by_user_id", (query) => query.eq("userId", userId))
+    .withIndex("by_user_id_and_recipient_role", (query: any) =>
+      query.eq("userId", args.userId).eq("recipientRole", args.recipientRole),
+    )
     .unique();
 }
 
@@ -32,7 +37,10 @@ export async function createNotification(
   input: CreateNotificationInput,
 ): Promise<Id<"notifications">> {
   const notificationId = await ctx.db.insert("notifications", input);
-  const existingState = await getNotificationState(ctx, input.userId);
+  const existingState = await getNotificationState(ctx, {
+    recipientRole: input.recipientRole,
+    userId: input.userId,
+  });
 
   if (existingState) {
     await ctx.db.patch(existingState._id, {
@@ -40,6 +48,7 @@ export async function createNotification(
     });
   } else {
     await ctx.db.insert("notificationStates", {
+      recipientRole: input.recipientRole,
       unreadCount: 1,
       userId: input.userId,
     });

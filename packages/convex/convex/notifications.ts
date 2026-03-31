@@ -6,15 +6,21 @@ import { getNotificationState } from "./lib/notifications";
 export const getInbox = queryGeneric({
   args: {
     limit: v.optional(v.number()),
+    recipientRole: v.union(v.literal("buyer"), v.literal("seller")),
     userId: v.string(),
   },
   handler: async (ctx, args) => {
     const limit = Math.max(1, Math.min(args.limit ?? 10, 20));
-    const notificationState = await getNotificationState(ctx, args.userId);
+    const notificationState = await getNotificationState(ctx, {
+      recipientRole: args.recipientRole,
+      userId: args.userId,
+    });
     const lastReadAt = notificationState?.lastReadAt ?? 0;
     const notifications = await ctx.db
       .query("notifications")
-      .withIndex("by_user_id", (query) => query.eq("userId", args.userId))
+      .withIndex("by_user_id_and_recipient_role", (query: any) =>
+        query.eq("userId", args.userId).eq("recipientRole", args.recipientRole),
+      )
       .order("desc")
       .take(limit);
 
@@ -30,10 +36,14 @@ export const getInbox = queryGeneric({
 
 export const markAllRead = mutationGeneric({
   args: {
+    recipientRole: v.union(v.literal("buyer"), v.literal("seller")),
     userId: v.string(),
   },
   handler: async (ctx, args) => {
-    const notificationState = await getNotificationState(ctx, args.userId);
+    const notificationState = await getNotificationState(ctx, {
+      recipientRole: args.recipientRole,
+      userId: args.userId,
+    });
 
     if (!notificationState) {
       return {

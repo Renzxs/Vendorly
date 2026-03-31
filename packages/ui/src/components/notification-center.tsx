@@ -37,8 +37,12 @@ export function NotificationCenter({
   unreadCount = 0,
 }: NotificationCenterProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const hasInitializedRef = useRef(false);
+  const previousLatestNotificationIdRef = useRef<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isMarkingRead, setIsMarkingRead] = useState(false);
+  const [toastNotification, setToastNotification] =
+    useState<NotificationItem | null>(null);
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent) {
@@ -62,6 +66,49 @@ export function NotificationCenter({
     };
   }, []);
 
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+
+    const latestNotification = notifications[0];
+
+    if (!latestNotification) {
+      hasInitializedRef.current = true;
+      previousLatestNotificationIdRef.current = null;
+      return;
+    }
+
+    if (!hasInitializedRef.current) {
+      hasInitializedRef.current = true;
+      previousLatestNotificationIdRef.current = latestNotification._id;
+      return;
+    }
+
+    if (
+      latestNotification._id !== previousLatestNotificationIdRef.current &&
+      latestNotification.isUnread
+    ) {
+      setToastNotification(latestNotification);
+    }
+
+    previousLatestNotificationIdRef.current = latestNotification._id;
+  }, [isLoading, notifications]);
+
+  useEffect(() => {
+    if (!toastNotification) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setToastNotification(null);
+    }, 5000);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [toastNotification]);
+
   async function handleMarkAllRead() {
     if (!onMarkAllRead || unreadCount === 0) {
       return;
@@ -78,6 +125,45 @@ export function NotificationCenter({
 
   return (
     <div ref={rootRef} className="relative">
+      {toastNotification ? (
+        <div className="fixed left-1/2 top-20 z-[60] w-[min(32rem,calc(100vw-2rem))] -translate-x-1/2">
+          <div className="rounded-[1.4rem] border border-emerald-200 bg-white/95 p-4 shadow-[0_24px_80px_rgba(15,23,42,0.18)] backdrop-blur">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                  New notification
+                </p>
+                <p className="mt-2 text-sm font-semibold text-slate-950">
+                  {toastNotification.title}
+                </p>
+                <p className="mt-1 text-sm leading-6 text-slate-600">
+                  {toastNotification.body}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setToastNotification(null)}
+                className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 transition hover:border-slate-300 hover:bg-white hover:text-slate-700"
+              >
+                Close
+              </button>
+            </div>
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                {formatNotificationTime(toastNotification._creationTime)}
+              </p>
+              <a
+                href={toastNotification.href}
+                onClick={() => setToastNotification(null)}
+                className="inline-flex items-center rounded-xl border border-slate-950 bg-slate-950 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+              >
+                Open
+              </a>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}

@@ -115,6 +115,7 @@ export async function markBuyerNotificationsReadAction() {
     await fetchMutation(
       api.notifications.markAllRead,
       {
+        recipientRole: "buyer",
         userId: currentUser.id,
       },
       getConvexServerOptions(),

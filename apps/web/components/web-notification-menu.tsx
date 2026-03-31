@@ -11,6 +11,7 @@ import { markBuyerNotificationsReadAction } from "@/app/actions/buyer";
 export function WebNotificationMenu({ userId }: { userId: string }) {
   const inbox = useQuery(api.notifications.getInbox, {
     limit: 10,
+    recipientRole: "buyer",
     userId,
   }) as NotificationInbox | undefined;
 

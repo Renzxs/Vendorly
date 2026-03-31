@@ -13,6 +13,7 @@ export async function markSellerNotificationsReadAction() {
   await fetchMutation(
     api.notifications.markAllRead,
     {
+      recipientRole: "seller",
       userId: currentUser.id,
     },
     getConvexServerOptions(),
