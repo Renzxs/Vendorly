@@ -5,12 +5,23 @@ import "./globals.css";
 
 import { auth } from "@/auth";
 import { WebNavbar } from "@/components/web-navbar";
+import {
+  buildSocialMetadata,
+  DEFAULT_METADATA_DESCRIPTION,
+  DEFAULT_METADATA_TITLE,
+  getMarketplaceUrl,
+} from "@/lib/metadata";
 import { Providers } from "./providers";
 
+const marketplaceUrl = getMarketplaceUrl();
+
 export const metadata: Metadata = {
-  title: "Vendorly | Discover storefront-first commerce",
-  description:
-    "Vendorly is a customizable marketplace where sellers launch branded storefronts and buyers discover standout products.",
+  metadataBase: marketplaceUrl,
+  title: DEFAULT_METADATA_TITLE,
+  ...buildSocialMetadata({
+    description: DEFAULT_METADATA_DESCRIPTION,
+    title: DEFAULT_METADATA_TITLE,
+  }),
 };
 
 const dashboardUrl =
