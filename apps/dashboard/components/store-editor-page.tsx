@@ -156,23 +156,23 @@ export function StoreEditorPage({
   }
 
   return (
-    <main className="mx-auto max-w-[96rem] px-4 py-8 sm:px-6 lg:px-8">
-      <div className="grid gap-8 xl:grid-cols-[300px_minmax(0,1fr)]">
+    <main className="mx-auto max-w-[86rem] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <div className="grid gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
         <StoreRouteSidebar activeStoreId={store?._id} stores={stores} />
 
         <div className="space-y-6">
-          <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <section className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
                   {isEditing ? "Edit storefront" : "New storefront"}
                 </p>
-                <h1 className="mt-4 font-[family-name:var(--font-display)] text-5xl leading-none tracking-tight text-slate-950 sm:text-6xl">
+                <h1 className="mt-4 font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950 sm:text-5xl">
                   {isEditing && store
                     ? `Update ${store.name}`
                     : "Create another store without leaving your current one behind"}
                 </h1>
-                <p className="mt-5 max-w-3xl text-base leading-8 text-slate-600">
+                <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
                   Keep creation, editing, and store details on separate pages so
                   each workflow has its own dedicated space.
                 </p>
@@ -182,14 +182,14 @@ export function StoreEditorPage({
                 {store ? (
                   <Link
                     href={`/dashboard/stores/${store._id}`}
-                    className="inline-flex rounded-xl border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
+                    className="inline-flex rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
                   >
                     View details
                   </Link>
                 ) : null}
                 <Link
                   href={store ? `/dashboard?store=${store._id}` : "/dashboard"}
-                  className="inline-flex rounded-xl border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
+                  className="inline-flex rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
                 >
                   Back to dashboard
                 </Link>
@@ -198,7 +198,7 @@ export function StoreEditorPage({
                     href={previewUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex rounded-xl border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
+                    className="inline-flex rounded-xl border border-slate-950 bg-slate-950 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
                   >
                     Preview live store
                   </a>
@@ -219,15 +219,15 @@ export function StoreEditorPage({
             </div>
           ) : null}
 
-          <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="grid gap-5 2xl:grid-cols-[minmax(0,1fr)_320px]">
             <form onSubmit={handleStoreSubmit}>
-              <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+              <section className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
                       Store editor
                     </p>
-                    <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+                    <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
                       {isEditing && store
                         ? `Editing ${store.name}`
                         : "Create a new storefront"}
@@ -239,7 +239,7 @@ export function StoreEditorPage({
                   </div>
                 </div>
 
-                <div className="mt-8 grid gap-5">
+                <div className="mt-6 grid gap-4">
                   <Field label="Store name">
                     <TextInput
                       onChange={(event) =>

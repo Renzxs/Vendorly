@@ -218,8 +218,8 @@ function StoreListCard({
 
 function EmptyProductsState() {
   return (
-    <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
-      <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+    <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+      <h3 className="font-[family-name:var(--font-display)] text-3xl leading-none tracking-tight text-slate-950">
         No products yet
       </h3>
       <p className="mt-3 text-sm leading-7 text-slate-600">
@@ -240,7 +240,7 @@ function Panel({
   return (
     <section
       className={cn(
-        "rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8",
+        "rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6",
         className,
       )}
     >
@@ -266,7 +266,7 @@ function PanelHeader({
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
           {eyebrow}
         </p>
-        <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+        <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
           {title}
         </h2>
         {description ? (
@@ -286,7 +286,7 @@ function MetricCard({ label, value }: { label: string; value: ReactNode }) {
       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
         {label}
       </p>
-      <div className="mt-3 break-words text-3xl font-semibold tracking-tight text-slate-950">
+      <div className="mt-2 break-words text-2xl font-semibold tracking-tight text-slate-950">
         {value}
       </div>
     </div>
@@ -808,25 +808,25 @@ export function DashboardShell({
   }
 
   return (
-    <main className="mx-auto max-w-[96rem] px-4 py-8 sm:px-6 lg:px-8">
-      <div className="grid gap-8 xl:grid-cols-[300px_minmax(0,1fr)]">
+    <main className="mx-auto max-w-[86rem] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <div className="grid gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
         <aside className="space-y-6 xl:sticky xl:top-24 xl:h-fit">
-          <div className="rounded-[2rem] border border-slate-950 bg-slate-950 p-6 text-white shadow-sm">
-            <div className="space-y-4">
-              <div className="flex items-start gap-4">
+          <div className="rounded-[1.75rem] border border-slate-950 bg-slate-950 p-5 text-white shadow-sm">
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
                 {currentUser.image ? (
                   <img
                     alt={currentUser.name || currentUser.email}
-                    className="h-14 w-14 rounded-2xl border border-white/10 object-cover"
+                    className="h-12 w-12 rounded-xl border border-white/10 object-cover"
                     src={currentUser.image}
                   />
                 ) : (
-                  <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-sm font-semibold text-white">
+                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/10 text-sm font-semibold text-white">
                     {getInitials(currentUser.name || currentUser.email)}
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="text-lg font-semibold tracking-tight [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">
+                  <p className="text-base font-semibold tracking-tight [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">
                     {currentUser.name || "Vendorly seller"}
                   </p>
                   <p className="mt-1 break-all text-sm text-white/70">
@@ -837,19 +837,19 @@ export function DashboardShell({
               <form action={signOutAction}>
                 <button
                   type="submit"
-                  className="inline-flex w-full justify-center rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/15"
+                  className="inline-flex w-full justify-center rounded-xl border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/15"
                 >
                   Sign out
                 </button>
               </form>
             </div>
 
-            <div className="mt-6 grid gap-3">
+            <div className="mt-5 grid gap-3">
               <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/55">
                   Stores owned
                 </p>
-                <p className="mt-3 text-3xl font-semibold tracking-tight">
+                <p className="mt-2 text-2xl font-semibold tracking-tight">
                   {stores.length}
                 </p>
               </div>
@@ -857,7 +857,7 @@ export function DashboardShell({
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/55">
                   Products in view
                 </p>
-                <p className="mt-3 text-3xl font-semibold tracking-tight">
+                <p className="mt-2 text-2xl font-semibold tracking-tight">
                   {selectedStoreProducts.length}
                 </p>
               </div>
@@ -870,7 +870,7 @@ export function DashboardShell({
                 const result = await seedDemoDataAction();
                 await applyActionResult(result);
               }}
-              className="mt-6 inline-flex w-full justify-center rounded-xl border border-white bg-white px-5 py-3 text-sm font-medium text-slate-950 transition hover:bg-slate-100"
+              className="mt-5 inline-flex w-full justify-center rounded-xl border border-white bg-white px-4 py-2.5 text-sm font-medium text-slate-950 transition hover:bg-slate-100"
             >
               Seed demo marketplace
             </button>
@@ -905,8 +905,8 @@ export function DashboardShell({
                   />
                 ))
               ) : (
-                <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
-                  <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+                <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+                  <h3 className="font-[family-name:var(--font-display)] text-3xl leading-none tracking-tight text-slate-950">
                     No stores yet
                   </h3>
                   <p className="mt-3 text-sm leading-7 text-slate-600">
@@ -920,17 +920,17 @@ export function DashboardShell({
 
         <div className="space-y-6">
           <Panel>
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
+            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-end">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
                   Seller dashboard
                 </p>
-                <h1 className="mt-4 font-[family-name:var(--font-display)] text-5xl leading-none tracking-tight text-slate-950 sm:text-6xl">
+                <h1 className="mt-4 font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950 sm:text-5xl">
                   {selectedStore
                     ? `Manage ${selectedStore.name}`
                     : "Set up your storefront workspace"}
                 </h1>
-                <p className="mt-5 max-w-3xl text-base leading-8 text-slate-600">
+                <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
                   Manage store details, add products, preview your storefront,
                   and stay on top of customer conversations from one admin view.
                 </p>
@@ -950,7 +950,7 @@ export function DashboardShell({
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
                     Active store
                   </p>
-                  <p className="mt-3 text-lg font-semibold tracking-tight text-slate-950">
+                  <p className="mt-2 text-base font-semibold tracking-tight text-slate-950">
                     {selectedStore?.name || "No store selected"}
                   </p>
                 </div>
@@ -970,7 +970,7 @@ export function DashboardShell({
             </div>
           ) : null}
 
-          <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="grid gap-5 2xl:grid-cols-[minmax(0,1fr)_320px]">
             <div className="space-y-6">
               <form onSubmit={handleStoreSubmit}>
                 <Panel>

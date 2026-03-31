@@ -31,22 +31,22 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     authProviderAvailability.github || authProviderAvailability.google;
 
   return (
-    <main className="mx-auto flex min-h-[calc(100vh-6rem)] max-w-5xl items-center px-4 py-16 sm:px-6 lg:px-8">
+    <main className="mx-auto flex min-h-[calc(100vh-6rem)] max-w-4xl items-center px-4 py-12 sm:px-6 lg:px-8">
       <div className="grid w-full gap-0 border border-black/10 bg-[rgba(255,253,247,0.92)] lg:grid-cols-[1.05fr_0.95fr]">
-        <section className="border-b border-black/10 p-6 sm:p-8 lg:border-b-0 lg:border-r">
+        <section className="border-b border-black/10 p-5 sm:p-6 lg:border-b-0 lg:border-r">
           <p className="text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-teal-700">
             Vendorly authentication
           </p>
-          <h1 className="mt-5 font-[family-name:var(--font-display)] text-5xl leading-none tracking-tight text-slate-950 sm:text-6xl">
+          <h1 className="mt-4 font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950 sm:text-5xl">
             Sign in with Google or GitHub to manage multiple storefronts.
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600">
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
             Your authenticated account becomes the store owner. One user can own
             multiple stores, and each store can hold its own product catalog.
           </p>
         </section>
 
-        <section className="bg-slate-950 p-6 text-white sm:p-8">
+        <section className="bg-slate-950 p-5 text-white sm:p-6">
           <p className="text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-white/55">
             Seller access
           </p>

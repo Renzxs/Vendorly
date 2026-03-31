@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useMutation } from "convex/react";
 
@@ -74,8 +75,15 @@ export function ProductSocialCard({
   return (
     <div className="flex h-full flex-col gap-3">
       <ProductCard
+        footerLabel="Product actions"
         footerContent={
           <>
+            <Link
+              href={`/product/${product._id}`}
+              className="inline-flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
+            >
+              View details
+            </Link>
             <button
               type="button"
               disabled={isSoldOut}
@@ -104,7 +112,7 @@ export function ProductSocialCard({
               }
               className="inline-flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
             >
-              Chat store
+              Chat seller
             </button>
           </>
         }

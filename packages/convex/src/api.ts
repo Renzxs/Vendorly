@@ -17,6 +17,7 @@ export const api = anyApi as {
   products: {
     createProduct: any;
     generateProductImageUploadUrl: any;
+    getProductById: any;
     getProductFeed: any;
     getMarketplaceProducts: any;
     getProductsByStore: any;

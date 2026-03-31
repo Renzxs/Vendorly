@@ -105,13 +105,13 @@ export function CartPageShell() {
   }
 
   return (
-    <main className="mx-auto max-w-[88rem] px-4 py-8 sm:px-6 lg:px-8">
+    <main className="mx-auto max-w-[80rem] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
             Checkout
           </p>
-          <h1 className="mt-3 font-[family-name:var(--font-display)] text-5xl leading-none tracking-tight text-slate-950">
+          <h1 className="mt-3 font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950 sm:text-5xl">
             Review your order
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600">
@@ -135,12 +135,12 @@ export function CartPageShell() {
         </div>
       </div>
 
-      <section className="mt-8 grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <section className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-6">
-          <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             {cart.items.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center">
-                <p className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+              <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+                <p className="font-[family-name:var(--font-display)] text-3xl leading-none tracking-tight text-slate-950">
                   Your cart is empty
                 </p>
                 <p className="mt-4 text-sm leading-7 text-slate-600">
@@ -153,33 +153,33 @@ export function CartPageShell() {
                 {cart.items.map((item) => (
                   <div
                     key={item.productId}
-                    className="rounded-3xl border border-slate-200 bg-slate-50 p-5"
+                    className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-4"
                   >
                     <div className="flex flex-col gap-4 sm:flex-row">
                       {item.image ? (
                         <img
                           alt={item.title}
-                          className="h-28 w-full rounded-2xl border border-slate-200 object-cover sm:w-28"
+                          className="h-24 w-full rounded-2xl border border-slate-200 object-cover sm:w-24"
                           src={item.image}
                         />
                       ) : (
-                        <div className="h-28 w-full rounded-2xl border border-slate-200 bg-white sm:w-28" />
+                        <div className="h-24 w-full rounded-2xl border border-slate-200 bg-white sm:w-24" />
                       )}
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-start justify-between gap-4">
                           <div>
-                            <p className="text-lg font-semibold text-slate-950">
+                            <p className="text-base font-semibold text-slate-950">
                               {item.title}
                             </p>
                             <p className="mt-1 text-sm text-slate-500">
                               {item.storeName ?? "Vendorly store"}
                             </p>
                           </div>
-                          <p className="text-lg font-semibold text-slate-950">
+                          <p className="text-base font-semibold text-slate-950">
                             {formatCurrency(item.price)}
                           </p>
                         </div>
-                        <div className="mt-5 flex flex-wrap items-center gap-3">
+                        <div className="mt-4 flex flex-wrap items-center gap-3">
                           <div className="flex items-center rounded-xl border border-slate-200 bg-white">
                             <button
                               type="button"
@@ -225,12 +225,12 @@ export function CartPageShell() {
             )}
           </div>
 
-          <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <div className="border-b border-slate-200 pb-5">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
                 Delivery details
               </p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
                 Shipping information
               </h2>
               <p className="mt-3 text-sm leading-7 text-slate-600">

@@ -46,8 +46,8 @@ export function ProductCard({
         ("store" in product ? product.store?.themeColor : undefined)
       }
       className={cn(
-        "overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm",
-        isList && "md:grid md:grid-cols-[220px_minmax(0,1fr)]",
+        "overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm",
+        isList && "md:grid md:grid-cols-[200px_minmax(0,1fr)]",
         className,
       )}
     >
@@ -55,7 +55,7 @@ export function ProductCard({
         className={cn(
           "relative isolate overflow-hidden bg-slate-100",
           isList
-            ? "h-56 border-b border-slate-200 md:h-full md:border-b-0 md:border-r"
+            ? "h-52 border-b border-slate-200 md:h-full md:border-b-0 md:border-r"
             : "aspect-[4/3] border-b border-slate-200",
         )}
       >
@@ -87,7 +87,7 @@ export function ProductCard({
                 type="button"
                 onClick={() => setActiveImage(index)}
                 className={cn(
-                  "h-12 w-12 overflow-hidden border-2 bg-white/90 transition",
+                  "h-10 w-10 overflow-hidden rounded-xl border-2 bg-white/90 transition",
                   index === activeImage
                     ? "border-white shadow-md"
                     : "border-white/40 opacity-80 hover:opacity-100",
@@ -109,8 +109,8 @@ export function ProductCard({
           </div>
         ) : null}
       </div>
-      <div className="flex h-full flex-col justify-between gap-5 p-5 sm:p-6">
-        <div className="space-y-4">
+      <div className="flex h-full flex-col justify-between gap-4 p-4 sm:p-5">
+        <div className="space-y-3">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-2">
               {resolvedStoreName ? (
@@ -118,12 +118,12 @@ export function ProductCard({
                   {resolvedStoreName}
                 </p>
               ) : null}
-              <h3 className="font-[family-name:var(--font-display)] text-3xl leading-none tracking-tight text-slate-950">
+              <h3 className="font-[family-name:var(--font-display)] text-2xl leading-none tracking-tight text-slate-950">
                 {product.title}
               </h3>
             </div>
             <div className="shrink-0 text-right">
-              <span className="text-lg font-semibold text-slate-950">
+              <span className="text-base font-semibold text-slate-950">
                 {formatCurrency(product.price)}
               </span>
               {product.isSoldOut ? (
@@ -133,11 +133,11 @@ export function ProductCard({
               ) : null}
             </div>
           </div>
-          <p className="max-w-2xl text-sm leading-6 text-slate-600 sm:text-base [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden">
+          <p className="max-w-2xl text-sm leading-6 text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden">
             {product.description}
           </p>
         </div>
-        <div className="mt-auto space-y-4 border-t border-slate-200 pt-4">
+        <div className="mt-auto space-y-3 border-t border-slate-200 pt-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
               {footerLabel}

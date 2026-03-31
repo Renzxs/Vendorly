@@ -24,10 +24,10 @@ function SectionTitle({
       <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
         {eyebrow}
       </p>
-      <h2 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+      <h2 className="font-[family-name:var(--font-display)] text-3xl leading-none tracking-tight text-slate-950 sm:text-4xl">
         {title}
       </h2>
-      <p className="max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+      <p className="max-w-2xl text-sm leading-6 text-slate-600 sm:leading-7">
         {body}
       </p>
     </div>
@@ -62,8 +62,8 @@ function LoadingProductGrid() {
 
 function EmptyState({ body, title }: { body: string; title: string }) {
   return (
-    <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
-      <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+    <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
+      <h3 className="font-[family-name:var(--font-display)] text-3xl leading-none tracking-tight text-slate-950">
         {title}
       </h3>
       <p className="mt-4 text-sm leading-7 text-slate-600">{body}</p>
@@ -99,41 +99,41 @@ export function MarketplaceShell() {
   }, [deferredSearchTerm, products, selectedStore]);
 
   return (
-    <main className="mx-auto max-w-[88rem] px-4 py-8 sm:px-6 lg:px-8">
-      <section className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
-        <div className="grid gap-0 lg:grid-cols-[minmax(0,1.2fr)_360px]">
-          <div className="p-8 sm:p-10">
+    <main className="mx-auto max-w-[80rem] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <section className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm">
+        <div className="grid gap-0 lg:grid-cols-[minmax(0,1.15fr)_320px]">
+          <div className="p-6 sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
               Vendorly marketplace
             </p>
-            <h1 className="mt-4 max-w-4xl font-[family-name:var(--font-display)] text-5xl leading-none tracking-tight text-slate-950 sm:text-6xl">
+            <h1 className="mt-4 max-w-4xl font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950 sm:text-5xl">
               Shop storefronts with a familiar ecommerce flow.
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600">
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
               Browse products, filter by seller, chat with stores, and keep your
               cart moving without having to fight through oversized bento
               panels.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-3">
               <a
                 href="#products"
-                className="inline-flex items-center rounded-xl border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
+                className="inline-flex items-center rounded-xl border border-slate-950 bg-slate-950 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
               >
                 Shop products
               </a>
               <a
                 href="/feed"
-                className="inline-flex items-center rounded-xl border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
+                className="inline-flex items-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
               >
                 View feed
               </a>
             </div>
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
                   Products
                 </p>
-                <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+                <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
                   {products?.length ?? 0}
                 </p>
               </div>
@@ -141,7 +141,7 @@ export function MarketplaceShell() {
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
                   Stores
                 </p>
-                <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+                <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
                   {stores?.length ?? 0}
                 </p>
               </div>
@@ -156,13 +156,13 @@ export function MarketplaceShell() {
             </div>
           </div>
 
-          <div className="border-t border-slate-200 bg-slate-50 p-8 lg:border-l lg:border-t-0">
+          <div className="border-t border-slate-200 bg-slate-50 p-6 lg:border-l lg:border-t-0">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
                   Featured stores
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+                <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-950">
                   Shop by brand
                 </h2>
               </div>
@@ -173,7 +173,7 @@ export function MarketplaceShell() {
                 Become a seller
               </a>
             </div>
-            <div className="mt-6 space-y-4">
+            <div className="mt-5 space-y-3">
               {(featuredStores.length > 0 ? featuredStores : (stores ?? []))
                 .slice(0, 3)
                 .map((store) => (
@@ -217,7 +217,7 @@ export function MarketplaceShell() {
           </a>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-5">
           {stores === undefined ? (
             <LoadingStoreGrid />
           ) : featuredStores.length > 0 ? (
@@ -235,13 +235,13 @@ export function MarketplaceShell() {
         </div>
       </section>
 
-      <section id="products" className="mt-12">
-        <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
-          <aside className="h-fit rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm lg:sticky lg:top-24">
+      <section id="products" className="mt-10">
+        <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <aside className="h-fit rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm lg:sticky lg:top-24">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
               Filters
             </p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
+            <h2 className="mt-3 text-xl font-semibold tracking-tight text-slate-950">
               Narrow your shopping view
             </h2>
             <p className="mt-3 text-sm leading-7 text-slate-600">
@@ -249,7 +249,7 @@ export function MarketplaceShell() {
               catalog focused on what shoppers actually want to see.
             </p>
 
-            <div className="mt-6 space-y-5">
+            <div className="mt-5 space-y-4">
               <label className="block">
                 <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
                   Search

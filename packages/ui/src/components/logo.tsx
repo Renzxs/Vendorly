@@ -14,17 +14,17 @@ export function Logo({
   textClassName,
 }: LogoProps) {
   return (
-    <div className={cn("flex items-center gap-4", className)}>
+    <div className={cn("flex items-center gap-3", className)}>
       <span
         className={cn(
-          "inline-flex h-12 w-12 items-center justify-center border border-slate-900 bg-[rgba(255,253,247,0.92)] text-slate-950",
+          "inline-flex h-10 w-10 items-center justify-center border border-slate-900 bg-[rgba(255,253,247,0.92)] text-slate-950",
           markClassName,
         )}
         aria-hidden="true"
       >
         <svg
           viewBox="0 0 64 64"
-          className="h-8 w-8"
+          className="h-7 w-7"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -52,10 +52,10 @@ export function Logo({
         </svg>
       </span>
       <div className={textClassName}>
-        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-slate-500">
+        <p className="text-[0.62rem] font-semibold uppercase tracking-[0.3em] text-slate-500">
           {label}
         </p>
-        <p className="font-[family-name:var(--font-display)] text-2xl leading-none tracking-tight text-slate-950">
+        <p className="font-[family-name:var(--font-display)] text-xl leading-none tracking-tight text-slate-950">
           Vendorly
         </p>
       </div>

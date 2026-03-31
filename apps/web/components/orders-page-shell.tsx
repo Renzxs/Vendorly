@@ -66,13 +66,13 @@ export function OrdersPageShell({
   placed?: boolean;
 }) {
   return (
-    <main className="mx-auto max-w-[88rem] px-4 py-8 sm:px-6 lg:px-8">
+    <main className="mx-auto max-w-[80rem] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
             Orders
           </p>
-          <h1 className="mt-3 font-[family-name:var(--font-display)] text-5xl leading-none tracking-tight text-slate-950">
+          <h1 className="mt-3 font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950 sm:text-5xl">
             Track your orders
           </h1>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600">
@@ -98,8 +98,8 @@ export function OrdersPageShell({
 
       <section className="mt-8">
         {orders.length === 0 ? (
-          <div className="rounded-[2rem] border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
-            <h2 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+          <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl leading-none tracking-tight text-slate-950">
               No orders yet
             </h2>
             <p className="mt-4 text-sm leading-7 text-slate-600">
@@ -112,14 +112,14 @@ export function OrdersPageShell({
             {orders.map((order) => (
               <article
                 key={order._id}
-                className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
+                className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
               >
                 <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 lg:flex-row lg:items-start lg:justify-between">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
                       Order {order.orderCode}
                     </p>
-                    <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+                    <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
                       {order.storeName}
                     </h2>
                     <p className="mt-2 text-sm text-slate-600">
@@ -151,7 +151,7 @@ export function OrdersPageShell({
                   </div>
                 </div>
 
-                <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+                <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
                   <div className="space-y-4">
                     {order.items.map((item) => (
                       <div

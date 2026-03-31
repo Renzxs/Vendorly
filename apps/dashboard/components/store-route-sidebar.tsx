@@ -12,12 +12,12 @@ export function StoreRouteSidebar({
   stores,
 }: StoreRouteSidebarProps) {
   return (
-    <aside className="space-y-6 xl:sticky xl:top-24 xl:h-fit">
-      <section className="rounded-[2rem] border border-slate-950 bg-slate-950 p-6 text-white shadow-sm">
+    <aside className="space-y-5 xl:sticky xl:top-24 xl:h-fit">
+      <section className="rounded-[1.75rem] border border-slate-950 bg-slate-950 p-5 text-white shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/55">
           Store pages
         </p>
-        <h2 className="mt-4 font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight">
+        <h2 className="mt-4 font-[family-name:var(--font-display)] text-3xl leading-none tracking-tight">
           Create, view, and edit each storefront separately.
         </h2>
         <p className="mt-4 text-sm leading-7 text-white/72">
@@ -25,28 +25,28 @@ export function StoreRouteSidebar({
           workspace when you want to manage products, orders, and chats.
         </p>
 
-        <div className="mt-6 grid gap-3">
+        <div className="mt-5 grid gap-3">
           <Link
             href="/dashboard/stores/new"
-            className="inline-flex justify-center rounded-xl border border-white bg-white px-5 py-3 text-sm font-medium text-slate-950 transition hover:bg-slate-100"
+            className="inline-flex justify-center rounded-xl border border-white bg-white px-4 py-2.5 text-sm font-medium text-slate-950 transition hover:bg-slate-100"
           >
             New store
           </Link>
           <Link
             href="/dashboard"
-            className="inline-flex justify-center rounded-xl border border-white/15 bg-white/10 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/15"
+            className="inline-flex justify-center rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/15"
           >
             Back to dashboard
           </Link>
         </div>
       </section>
 
-      <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
             Your storefronts
           </p>
-          <h3 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+          <h3 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
             Open any store
           </h3>
           <p className="mt-3 text-sm leading-7 text-slate-600">
@@ -160,8 +160,8 @@ export function StoreRouteSidebar({
               );
             })
           ) : (
-            <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
-              <h3 className="font-[family-name:var(--font-display)] text-3xl leading-none tracking-tight text-slate-950">
+            <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+              <h3 className="font-[family-name:var(--font-display)] text-2xl leading-none tracking-tight text-slate-950">
                 No stores yet
               </h3>
               <p className="mt-3 text-sm leading-7 text-slate-600">

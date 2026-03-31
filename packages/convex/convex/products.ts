@@ -11,8 +11,8 @@ async function hydrateProduct(ctx: any, product: any) {
         ? [product.image]
         : [];
   const uploadedImages = await Promise.all(
-    (product.imageStorageIds ?? []).map(async (storageId: any) =>
-      await ctx.storage.getUrl(storageId),
+    (product.imageStorageIds ?? []).map(
+      async (storageId: any) => await ctx.storage.getUrl(storageId),
     ),
   );
   const resolvedImages = [...externalImages, ...uploadedImages.filter(Boolean)];
@@ -21,6 +21,33 @@ async function hydrateProduct(ctx: any, product: any) {
     ...product,
     image: resolvedImages[0] ?? product.image,
     resolvedImages,
+  };
+}
+
+async function hydrateMarketplaceProduct(
+  ctx: any,
+  product: any,
+  viewerId?: string,
+) {
+  const store = await ctx.db.get(product.storeId);
+  const hydratedProduct = await hydrateProduct(ctx, product);
+  const reactionSummary = await getProductReactionSummary(
+    ctx,
+    product._id,
+    viewerId,
+  );
+
+  return {
+    ...hydratedProduct,
+    ...reactionSummary,
+    store: store
+      ? {
+          _id: store._id,
+          name: store.name,
+          slug: store.slug,
+          themeColor: store.themeColor,
+        }
+      : undefined,
   };
 }
 
@@ -56,33 +83,30 @@ export const getMarketplaceProducts = queryGeneric({
     const products = await ctx.db.query("products").collect();
 
     const hydratedProducts = await Promise.all(
-      products.map(async (product) => {
-        const store = await ctx.db.get(product.storeId);
-        const hydratedProduct = await hydrateProduct(ctx, product);
-        const reactionSummary = await getProductReactionSummary(
-          ctx,
-          product._id,
-          args.viewerId,
-        );
-
-        return {
-          ...hydratedProduct,
-          ...reactionSummary,
-          store: store
-            ? {
-                _id: store._id,
-                name: store.name,
-                slug: store.slug,
-                themeColor: store.themeColor,
-              }
-            : undefined,
-        };
-      }),
+      products.map((product) =>
+        hydrateMarketplaceProduct(ctx, product, args.viewerId),
+      ),
     );
 
     return hydratedProducts.sort(
       (left, right) => (right._creationTime ?? 0) - (left._creationTime ?? 0),
     );
+  },
+});
+
+export const getProductById = queryGeneric({
+  args: {
+    productId: v.id("products"),
+    viewerId: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const product = await ctx.db.get(args.productId);
+
+    if (!product) {
+      return null;
+    }
+
+    return await hydrateMarketplaceProduct(ctx, product, args.viewerId);
   },
 });
 
@@ -96,27 +120,16 @@ export const getProductFeed = queryGeneric({
 
     const feedProducts = await Promise.all(
       products.map(async (product) => {
-        const store = await ctx.db.get(product.storeId);
-        const hydratedProduct = await hydrateProduct(ctx, product);
-        const reactionSummary = await getProductReactionSummary(
+        const hydratedProduct = await hydrateMarketplaceProduct(
           ctx,
-          product._id,
+          product,
           args.viewerId,
         );
         const fromFollowedStore = followedStoreIds.has(String(product.storeId));
 
         return {
           ...hydratedProduct,
-          ...reactionSummary,
           fromFollowedStore,
-          store: store
-            ? {
-                _id: store._id,
-                name: store.name,
-                slug: store.slug,
-                themeColor: store.themeColor,
-              }
-            : undefined,
         };
       }),
     );

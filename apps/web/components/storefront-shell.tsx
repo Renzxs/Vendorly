@@ -56,8 +56,8 @@ function StoreProducts({
 
   if (products.length === 0) {
     return (
-      <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
-        <h2 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+      <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
+        <h2 className="font-[family-name:var(--font-display)] text-3xl leading-none tracking-tight text-slate-950">
           This storefront is ready for its first drop.
         </h2>
         <p className="mt-4 text-sm leading-7 text-slate-600">
@@ -69,7 +69,7 @@ function StoreProducts({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 rounded-[1.75rem] border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
             Product catalog
@@ -127,7 +127,7 @@ export function StorefrontShell({ slug }: { slug: string }) {
 
   if (store === undefined) {
     return (
-      <main className="mx-auto max-w-[88rem] px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-[80rem] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <StorefrontLoading />
       </main>
     );
@@ -136,11 +136,11 @@ export function StorefrontShell({ slug }: { slug: string }) {
   if (store === null) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6 lg:px-8">
-        <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 shadow-sm">
+        <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-white p-8 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
             Store not found
           </p>
-          <h1 className="mt-4 font-[family-name:var(--font-display)] text-5xl leading-none tracking-tight text-slate-950">
+          <h1 className="mt-4 font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950 sm:text-5xl">
             This Vendorly storefront doesn&apos;t exist yet.
           </h1>
           <p className="mt-4 text-sm leading-7 text-slate-600">
@@ -183,7 +183,7 @@ export function StorefrontShell({ slug }: { slug: string }) {
 
   return (
     <ThemeWrapper themeColor={store.themeColor}>
-      <main className="mx-auto max-w-[88rem] px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-[80rem] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <Link
@@ -235,13 +235,13 @@ export function StorefrontShell({ slug }: { slug: string }) {
           themeColor={store.themeColor}
         />
 
-        <section className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <section className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
           <div className="space-y-6">
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
                 Storefront overview
               </p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
                 Browse the current collection
               </h2>
               <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">

@@ -20,10 +20,10 @@ function FeedSection({
   title: string;
 }) {
   return (
-    <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <section className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
       <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
+          <h2 className="text-xl font-semibold tracking-tight text-slate-950 sm:text-2xl">
             {title}
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">
@@ -51,8 +51,8 @@ function FeedLoading() {
 
 function EmptyFeedState() {
   return (
-    <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
-      <h2 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+    <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
+      <h2 className="font-[family-name:var(--font-display)] text-3xl leading-none tracking-tight text-slate-950">
         No products in the feed yet
       </h2>
       <p className="mt-4 text-sm leading-7 text-slate-600">
@@ -79,17 +79,17 @@ export function ProductFeedShell() {
   );
 
   return (
-    <main className="mx-auto max-w-[88rem] px-4 py-8 sm:px-6 lg:px-8">
-      <section className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm sm:p-10">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end">
+    <main className="mx-auto max-w-[80rem] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <section className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_240px] lg:items-end">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
               Product feed
             </p>
-            <h1 className="mt-4 font-[family-name:var(--font-display)] text-5xl leading-none tracking-tight text-slate-950 sm:text-6xl">
+            <h1 className="mt-4 font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950 sm:text-5xl">
               Track new drops without the clutter.
             </h1>
-            <p className="mt-5 max-w-3xl text-base leading-8 text-slate-600">
+            <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
               Follow stores, review their latest products, and jump into a
               cleaner activity feed built around shopping decisions.
             </p>
@@ -99,7 +99,7 @@ export function ProductFeedShell() {
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
                 Total feed items
               </p>
-              <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+              <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
                 {feed?.length ?? 0}
               </p>
             </div>
@@ -107,7 +107,7 @@ export function ProductFeedShell() {
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
                 Followed stores
               </p>
-              <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+              <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
                 {followedDrops.length}
               </p>
             </div>
@@ -115,7 +115,7 @@ export function ProductFeedShell() {
         </div>
       </section>
 
-      <div className="mt-8 space-y-6">
+      <div className="mt-6 space-y-5">
         {feed === undefined ? (
           <FeedLoading />
         ) : feed.length === 0 ? (

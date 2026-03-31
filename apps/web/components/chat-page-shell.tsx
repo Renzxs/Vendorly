@@ -73,13 +73,13 @@ export function ChatPageShell() {
   }
 
   return (
-    <main className="mx-auto max-w-[88rem] px-4 py-8 sm:px-6 lg:px-8">
+    <main className="mx-auto max-w-[80rem] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
             Store chat
           </p>
-          <h1 className="mt-3 font-[family-name:var(--font-display)] text-5xl leading-none tracking-tight text-slate-950">
+          <h1 className="mt-3 font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950 sm:text-5xl">
             {storeName ?? "Chat with a store"}
           </h1>
           {viewerName ? (
@@ -107,9 +107,9 @@ export function ChatPageShell() {
         </div>
       </div>
 
-      <section className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="rounded-[2rem] border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-200 px-6 py-6 sm:px-8">
+      <section className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="rounded-[1.75rem] border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-200 px-5 py-5 sm:px-6">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
               Conversation
             </p>
@@ -123,10 +123,10 @@ export function ChatPageShell() {
             ) : null}
           </div>
 
-          <div className="px-6 py-6 sm:px-8">
+          <div className="px-5 py-5 sm:px-6">
             {!storeId ? (
-              <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center">
-                <p className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+              <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+                <p className="font-[family-name:var(--font-display)] text-3xl leading-none tracking-tight text-slate-950">
                   Choose a store to chat with
                 </p>
                 <p className="mt-4 text-sm leading-7 text-slate-600">
@@ -135,7 +135,7 @@ export function ChatPageShell() {
               </div>
             ) : (
               <>
-                <div className="min-h-[24rem] rounded-3xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
+                <div className="min-h-[22rem] rounded-[1.75rem] border border-slate-200 bg-slate-50 p-4 sm:p-5">
                   {messages === undefined ? (
                     <div className="space-y-3">
                       {Array.from({ length: 3 }).map((_, index) => (
@@ -150,7 +150,7 @@ export function ChatPageShell() {
                       {messages.map((message) => (
                         <div
                           key={message._id}
-                          className={`max-w-[88%] rounded-3xl border px-4 py-3 text-sm leading-7 ${
+                          className={`max-w-[88%] rounded-[1.5rem] border px-4 py-3 text-sm leading-7 ${
                             message.senderType === "buyer"
                               ? "ml-auto border-slate-950 bg-slate-950 text-white"
                               : "border-slate-200 bg-white text-slate-700"
@@ -172,8 +172,8 @@ export function ChatPageShell() {
                       ))}
                     </div>
                   ) : (
-                    <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-8 text-center">
-                      <p className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
+                    <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-white p-7 text-center">
+                      <p className="font-[family-name:var(--font-display)] text-3xl leading-none tracking-tight text-slate-950">
                         Start the conversation
                       </p>
                       <p className="mt-4 text-sm leading-7 text-slate-600">
@@ -184,7 +184,7 @@ export function ChatPageShell() {
                   )}
                 </div>
 
-                <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
+                <div className="mt-5 rounded-[1.75rem] border border-slate-200 bg-white p-4 sm:p-5">
                   <label className="block">
                     <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
                       Message
@@ -203,7 +203,7 @@ export function ChatPageShell() {
                     type="button"
                     disabled={isSending || !body.trim()}
                     onClick={handleSendMessage}
-                    className="mt-4 inline-flex w-full justify-center rounded-xl border border-slate-950 bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="mt-4 inline-flex w-full justify-center rounded-xl border border-slate-950 bg-slate-950 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isSending ? "Sending..." : "Send message"}
                   </button>
@@ -213,7 +213,7 @@ export function ChatPageShell() {
           </div>
         </div>
 
-        <aside className="h-fit rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm lg:sticky lg:top-24">
+        <aside className="h-fit rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm lg:sticky lg:top-24">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
             Conversation details
           </p>

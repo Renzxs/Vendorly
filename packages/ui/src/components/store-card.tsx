@@ -37,7 +37,7 @@ export function StoreCard({
       as="article"
       themeColor={store.themeColor}
       className={cn(
-        "flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm",
+        "flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm",
         className,
       )}
     >
@@ -45,18 +45,18 @@ export function StoreCard({
         className="h-1.5 w-full"
         style={{ backgroundColor: "var(--vendorly-theme)" }}
       />
-      <div className="flex flex-1 flex-col gap-5 p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-4">
+      <div className="flex flex-1 flex-col gap-4 p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3">
             {store.logoImage ? (
               <img
                 alt={`${store.name} logo`}
-                className="h-14 w-14 rounded-2xl border border-slate-200 object-cover"
+                className="h-12 w-12 rounded-xl border border-slate-200 object-cover"
                 src={store.logoImage}
               />
             ) : (
               <div
-                className="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 text-sm font-semibold text-slate-950"
+                className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 text-sm font-semibold text-slate-950"
                 style={{
                   backgroundColor:
                     "color-mix(in srgb, var(--vendorly-theme) 12%, white)",
@@ -69,7 +69,7 @@ export function StoreCard({
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
                 Seller storefront
               </p>
-              <h3 className="mt-2 font-[family-name:var(--font-display)] text-3xl leading-none tracking-tight text-slate-950">
+              <h3 className="mt-1.5 font-[family-name:var(--font-display)] text-2xl leading-none tracking-tight text-slate-950">
                 {store.name}
               </h3>
             </div>
@@ -79,7 +79,7 @@ export function StoreCard({
           </span>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           <p className="text-sm leading-6 text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden">
             {store.description}
           </p>
@@ -103,7 +103,7 @@ export function StoreCard({
           </div>
         ) : null}
 
-        <div className="mt-auto flex items-center justify-between gap-4 border-t border-slate-200 pt-4">
+        <div className="mt-auto flex items-center justify-between gap-3 border-t border-slate-200 pt-3">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
             Browse products
           </p>
