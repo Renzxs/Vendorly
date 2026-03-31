@@ -10,6 +10,7 @@ import { api } from "@vendorly/convex";
 import type { ChatMessage } from "@vendorly/utils";
 
 import { sendViewerStoreMessageAction } from "@/app/actions/buyer";
+import { getActionErrorMessage } from "@/lib/action-errors";
 
 function getSearchParam(
   searchParams: URLSearchParams,
@@ -80,19 +81,21 @@ export function ChatPageShell() {
     setError(null);
 
     try {
-      await sendViewerStoreMessageAction({
+      const result = await sendViewerStoreMessageAction({
         body,
         productId,
         productTitle,
         storeId,
       });
+
+      if (!result.success) {
+        setError(result.message);
+        return;
+      }
+
       setBody("");
     } catch (messageError) {
-      setError(
-        messageError instanceof Error
-          ? messageError.message
-          : "Unable to send message.",
-      );
+      setError(getActionErrorMessage(messageError, "Unable to send message."));
     } finally {
       setIsSending(false);
     }

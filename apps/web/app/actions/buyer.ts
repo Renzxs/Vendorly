@@ -2,10 +2,11 @@
 
 import { fetchMutation } from "convex/nextjs";
 
-import { internal } from "@vendorly/convex";
+import { api } from "@vendorly/convex";
 import type { ProductReaction } from "@vendorly/utils";
 
 import { auth } from "@/auth";
+import { getActionErrorMessage } from "@/lib/action-errors";
 import { getConvexServerOptions } from "@/lib/convex";
 
 async function requireAuthenticatedBuyer() {
@@ -26,30 +27,52 @@ export async function toggleProductReactionAction(input: {
   productId: string;
   reaction: ProductReaction;
 }) {
-  const currentUser = await requireAuthenticatedBuyer();
+  try {
+    const currentUser = await requireAuthenticatedBuyer();
 
-  return await fetchMutation(
-    internal.products.toggleProductReaction,
-    {
-      productId: input.productId,
-      reaction: input.reaction,
-      viewerId: currentUser.id,
-    },
-    getConvexServerOptions(),
-  );
+    await fetchMutation(
+      api.products.toggleProductReaction,
+      {
+        productId: input.productId,
+        reaction: input.reaction,
+        viewerId: currentUser.id,
+      },
+      getConvexServerOptions(),
+    );
+
+    return {
+      success: true as const,
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      message: getActionErrorMessage(error, "Unable to save reaction."),
+    };
+  }
 }
 
 export async function toggleStoreFollowAction(input: { storeId: string }) {
-  const currentUser = await requireAuthenticatedBuyer();
+  try {
+    const currentUser = await requireAuthenticatedBuyer();
 
-  return await fetchMutation(
-    internal.stores.toggleStoreFollow,
-    {
-      storeId: input.storeId,
-      viewerId: currentUser.id,
-    },
-    getConvexServerOptions(),
-  );
+    await fetchMutation(
+      api.stores.toggleStoreFollow,
+      {
+        storeId: input.storeId,
+        viewerId: currentUser.id,
+      },
+      getConvexServerOptions(),
+    );
+
+    return {
+      success: true as const,
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      message: getActionErrorMessage(error, "Unable to update follow state."),
+    };
+  }
 }
 
 export async function sendViewerStoreMessageAction(input: {
@@ -58,18 +81,29 @@ export async function sendViewerStoreMessageAction(input: {
   productTitle?: string;
   storeId: string;
 }) {
-  const currentUser = await requireAuthenticatedBuyer();
+  try {
+    const currentUser = await requireAuthenticatedBuyer();
 
-  return await fetchMutation(
-    internal.chat.sendViewerStoreMessage,
-    {
-      body: input.body,
-      productId: input.productId,
-      productTitle: input.productTitle,
-      storeId: input.storeId,
-      viewerId: currentUser.id,
-      viewerName: currentUser.name ?? currentUser.email,
-    },
-    getConvexServerOptions(),
-  );
+    await fetchMutation(
+      api.chat.sendViewerStoreMessage,
+      {
+        body: input.body,
+        productId: input.productId,
+        productTitle: input.productTitle,
+        storeId: input.storeId,
+        viewerId: currentUser.id,
+        viewerName: currentUser.name ?? currentUser.email,
+      },
+      getConvexServerOptions(),
+    );
+
+    return {
+      success: true as const,
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      message: getActionErrorMessage(error, "Unable to send message."),
+    };
+  }
 }

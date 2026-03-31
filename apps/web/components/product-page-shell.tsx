@@ -16,6 +16,7 @@ import {
 } from "@vendorly/utils";
 
 import { toggleProductReactionAction } from "@/app/actions/buyer";
+import { getActionErrorMessage } from "@/lib/action-errors";
 import { useCart } from "@/lib/cart";
 import { useStoreChat } from "@/lib/store-chat";
 import { useViewerId } from "@/lib/use-viewer-id";
@@ -110,16 +111,16 @@ export function ProductPageShell({ productId }: { productId: string }) {
     startTransition(async () => {
       try {
         setError(null);
-        await toggleProductReactionAction({
+        const result = await toggleProductReactionAction({
           productId: productRecordId,
           reaction,
         });
+
+        if (!result.success) {
+          setError(result.message);
+        }
       } catch (mutationError) {
-        setError(
-          mutationError instanceof Error
-            ? mutationError.message
-            : "Unable to save reaction.",
-        );
+        setError(getActionErrorMessage(mutationError, "Unable to save reaction."));
       }
     });
   }

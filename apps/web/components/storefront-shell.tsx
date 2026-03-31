@@ -14,6 +14,7 @@ import {
 } from "@vendorly/utils";
 
 import { toggleStoreFollowAction } from "@/app/actions/buyer";
+import { getActionErrorMessage } from "@/lib/action-errors";
 import { useStoreChat } from "@/lib/store-chat";
 import { useViewerId } from "@/lib/use-viewer-id";
 import { ProductSocialCard } from "./product-social-card";
@@ -168,15 +169,15 @@ export function StorefrontShell({ slug }: { slug: string }) {
     startTransition(async () => {
       try {
         setFollowError(null);
-        await toggleStoreFollowAction({
+        const result = await toggleStoreFollowAction({
           storeId,
         });
+
+        if (!result.success) {
+          setFollowError(result.message);
+        }
       } catch (error) {
-        setFollowError(
-          error instanceof Error
-            ? error.message
-            : "Unable to update follow state.",
-        );
+        setFollowError(getActionErrorMessage(error, "Unable to update follow state."));
       }
     });
   }

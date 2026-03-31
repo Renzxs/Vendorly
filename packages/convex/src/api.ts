@@ -6,6 +6,7 @@ export const api = anyApi as {
     getOwnerStoreChatThreads: any;
     getViewerStoreMessages: any;
     sendSellerStoreMessage: any;
+    sendViewerStoreMessage: any;
   };
   orders: {
     createOrdersFromCheckout: any;
@@ -20,6 +21,7 @@ export const api = anyApi as {
     getProductFeed: any;
     getMarketplaceProducts: any;
     getProductsByStore: any;
+    toggleProductReaction: any;
     updateProduct: any;
   };
   seed: {
@@ -30,23 +32,12 @@ export const api = anyApi as {
     getStoresByOwner: any;
     getStoreBySlug: any;
     getStores: any;
+    toggleStoreFollow: any;
     updateStore: any;
   };
   users: {
     getUserByAuthUserId: any;
     getUserByEmail: any;
     syncUser: any;
-  };
-};
-
-export const internal = anyApi as {
-  chat: {
-    sendViewerStoreMessage: any;
-  };
-  products: {
-    toggleProductReaction: any;
-  };
-  stores: {
-    toggleStoreFollow: any;
   };
 };

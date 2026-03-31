@@ -1,8 +1,6 @@
 import { mutationGeneric, queryGeneric } from "convex/server";
 import { v } from "convex/values";
 
-import { internalMutation } from "./_generated/server";
-
 function sortMessagesAscending(left: any, right: any) {
   return (left._creationTime ?? 0) - (right._creationTime ?? 0);
 }
@@ -102,7 +100,7 @@ export const getOwnerStoreChatMessages = queryGeneric({
   },
 });
 
-export const sendViewerStoreMessage = internalMutation({
+export const sendViewerStoreMessage = mutationGeneric({
   args: {
     body: v.string(),
     productId: v.optional(v.id("products")),
