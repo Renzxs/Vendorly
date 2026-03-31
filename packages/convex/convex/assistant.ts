@@ -67,9 +67,9 @@ function truncateText(value: string, maxLength: number) {
   return `${value.slice(0, maxLength - 1).trimEnd()}...`;
 }
 
-function formatUsdPrice(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    currency: "USD",
+function formatPhpPrice(value: number) {
+  return new Intl.NumberFormat("en-PH", {
+    currency: "PHP",
     style: "currency",
   }).format(value);
 }
@@ -81,7 +81,7 @@ function buildCatalogPreviewLines(context: AssistantContext) {
 
   return context.catalogPreview.map(
     (product) =>
-      `- ${product.title} | ${formatUsdPrice(product.price)} | ${
+      `- ${product.title} | ${formatPhpPrice(product.price)} | ${
         product.isSoldOut ? "Sold out" : "Available"
       } | ${truncateText(normalizeText(product.description), 220)}`,
   );
@@ -129,7 +129,7 @@ function buildSystemPrompt(context: AssistantContext) {
       "",
       "Highlighted product:",
       `- Title: ${context.highlightedProduct.title}`,
-      `- Price: ${formatUsdPrice(context.highlightedProduct.price)}`,
+      `- Price: ${formatPhpPrice(context.highlightedProduct.price)}`,
       `- Status: ${
         context.highlightedProduct.isSoldOut ? "Sold out" : "Available"
       }`,

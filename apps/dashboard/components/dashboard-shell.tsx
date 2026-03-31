@@ -1257,7 +1257,7 @@ export function DashboardShell({
                     </Field>
 
                     <div className="grid gap-5 md:grid-cols-[220px_1fr]">
-                      <Field label="Price (USD)">
+                      <Field label="Price (PHP)">
                         <TextInput
                           min="0"
                           onChange={(event) =>
