@@ -1,6 +1,11 @@
 export type LayoutType = "grid" | "list";
 export type ProductReaction = "love" | "fire" | "wow";
 export type ChatSender = "buyer" | "seller";
+export type NotificationKind =
+  | "chat_message"
+  | "order_created"
+  | "order_updated";
+export type NotificationRecipientRole = "buyer" | "seller";
 export type OrderPaymentMethod = "card" | "cod" | "online";
 export type OrderPaymentStatus = "cod_due" | "paid" | "pending";
 export type OrderStatus =
@@ -107,6 +112,23 @@ export interface ChatThread {
   storeId: string;
   viewerId: string;
   viewerName?: string;
+}
+
+export interface NotificationItem {
+  _id: string;
+  _creationTime?: number;
+  body: string;
+  href: string;
+  isUnread: boolean;
+  kind: NotificationKind;
+  recipientRole: NotificationRecipientRole;
+  title: string;
+  userId: string;
+}
+
+export interface NotificationInbox {
+  notifications: NotificationItem[];
+  unreadCount: number;
 }
 
 export interface OrderLineItem {

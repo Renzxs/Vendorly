@@ -1,8 +1,36 @@
 import { mutationGeneric, queryGeneric } from "convex/server";
 import { v } from "convex/values";
 
+import {
+  createNotification,
+  truncateNotificationText,
+} from "./lib/notifications";
+
 function sortMessagesAscending(left: any, right: any) {
   return (left._creationTime ?? 0) - (right._creationTime ?? 0);
+}
+
+function buildDashboardChatHref(storeId: string, viewerId: string) {
+  const searchParams = new URLSearchParams({
+    chat: viewerId,
+    store: storeId,
+  });
+
+  return `/dashboard?${searchParams.toString()}`;
+}
+
+function buildBuyerChatHref(args: {
+  storeId: string;
+  storeName: string;
+  storeSlug: string;
+}) {
+  const searchParams = new URLSearchParams({
+    storeId: args.storeId,
+    storeName: args.storeName,
+    storeSlug: args.storeSlug,
+  });
+
+  return `/chat?${searchParams.toString()}`;
 }
 
 export const getViewerStoreMessages = queryGeneric({
@@ -122,7 +150,7 @@ export const sendViewerStoreMessage = mutationGeneric({
       throw new Error("Message cannot be empty.");
     }
 
-    return await ctx.db.insert("chatMessages", {
+    const messageId = await ctx.db.insert("chatMessages", {
       body,
       productId: args.productId,
       productTitle: args.productTitle,
@@ -131,6 +159,19 @@ export const sendViewerStoreMessage = mutationGeneric({
       viewerId: args.viewerId,
       viewerName: args.viewerName?.trim() || undefined,
     });
+
+    await createNotification(ctx, {
+      body: `${
+        args.viewerName?.trim() || `Guest ${args.viewerId.slice(0, 4)}`
+      }: ${truncateNotificationText(body, 90)}`,
+      href: buildDashboardChatHref(String(args.storeId), args.viewerId),
+      kind: "chat_message",
+      recipientRole: "seller",
+      title: `New message for ${store.name}`,
+      userId: store.ownerId,
+    });
+
+    return messageId;
   },
 });
 
@@ -154,11 +195,26 @@ export const sendSellerStoreMessage = mutationGeneric({
       throw new Error("Message cannot be empty.");
     }
 
-    return await ctx.db.insert("chatMessages", {
+    const messageId = await ctx.db.insert("chatMessages", {
       body,
       senderType: "seller",
       storeId: args.storeId,
       viewerId: args.viewerId,
     });
+
+    await createNotification(ctx, {
+      body: `${store.name}: ${truncateNotificationText(body, 90)}`,
+      href: buildBuyerChatHref({
+        storeId: String(args.storeId),
+        storeName: store.name,
+        storeSlug: store.slug,
+      }),
+      kind: "chat_message",
+      recipientRole: "buyer",
+      title: `${store.name} replied to your chat`,
+      userId: args.viewerId,
+    });
+
+    return messageId;
   },
 });

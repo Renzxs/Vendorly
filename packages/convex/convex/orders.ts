@@ -1,7 +1,13 @@
 import { mutationGeneric, queryGeneric } from "convex/server";
 import { v } from "convex/values";
 
-import { calculateShippingFee } from "@vendorly/utils";
+import {
+  calculateShippingFee,
+  getOrderStatusLabel,
+  getPaymentStatusLabel,
+} from "@vendorly/utils";
+
+import { createNotification } from "./lib/notifications";
 
 const orderPaymentMethodValidator = v.union(
   v.literal("card"),
@@ -39,6 +45,14 @@ const shippingAddressValidator = v.object({
 
 function generateOrderCodeCandidate() {
   return `VD-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+}
+
+function buildDashboardOrderHref(storeId: string) {
+  return `/dashboard?store=${encodeURIComponent(storeId)}`;
+}
+
+function buildBuyerOrdersHref() {
+  return "/orders";
 }
 
 async function generateUniqueOrderCode(ctx: any) {
@@ -314,6 +328,24 @@ export const createOrdersFromCheckout = mutationGeneric({
         total,
       });
 
+      await createNotification(ctx, {
+        body: `${storeOrder.store.name} received order ${orderCode} for ${storeOrder.itemCount} item${storeOrder.itemCount === 1 ? "" : "s"}.`,
+        href: buildDashboardOrderHref(String(storeOrder.store._id)),
+        kind: "order_created",
+        recipientRole: "seller",
+        title: `New order from ${args.buyerName?.trim() || args.buyerEmail}`,
+        userId: storeOrder.store.ownerId,
+      });
+
+      await createNotification(ctx, {
+        body: `Order ${orderCode} at ${storeOrder.store.name} is ${getOrderStatusLabel(initialOrderState.orderStatus).toLowerCase()}.`,
+        href: buildBuyerOrdersHref(),
+        kind: "order_created",
+        recipientRole: "buyer",
+        title: `Order placed with ${storeOrder.store.name}`,
+        userId: args.buyerId,
+      });
+
       createdOrders.push({
         orderCode,
         orderId,
@@ -383,6 +415,22 @@ export const updateOrderStatus = mutationGeneric({
         },
       ],
       statusUpdatedAt: now,
+    });
+
+    await createNotification(ctx, {
+      body: `${store.name} updated order ${order.orderCode}: ${buildUpdateLabel(
+        {
+          nextOrderStatus,
+          nextPaymentStatus,
+          orderStatusChanged,
+          paymentStatusChanged,
+        },
+      )} Payment is ${getPaymentStatusLabel(nextPaymentStatus).toLowerCase()}.`,
+      href: buildBuyerOrdersHref(),
+      kind: "order_updated",
+      recipientRole: "buyer",
+      title: `Order ${order.orderCode} was updated`,
+      userId: order.buyerId,
     });
 
     return args.orderId;

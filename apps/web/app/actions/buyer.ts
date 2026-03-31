@@ -107,3 +107,29 @@ export async function sendViewerStoreMessageAction(input: {
     };
   }
 }
+
+export async function markBuyerNotificationsReadAction() {
+  try {
+    const currentUser = await requireAuthenticatedBuyer();
+
+    await fetchMutation(
+      api.notifications.markAllRead,
+      {
+        userId: currentUser.id,
+      },
+      getConvexServerOptions(),
+    );
+
+    return {
+      success: true as const,
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      message: getActionErrorMessage(
+        error,
+        "Unable to update your notifications.",
+      ),
+    };
+  }
+}

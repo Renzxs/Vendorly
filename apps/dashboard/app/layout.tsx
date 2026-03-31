@@ -3,6 +3,9 @@ import type { ReactNode } from "react";
 
 import { Navbar } from "@vendorly/ui";
 
+import { auth } from "@/auth";
+import { DashboardNavbarActions } from "@/components/dashboard-navbar-actions";
+
 import "./globals.css";
 
 import { Providers } from "./providers";
@@ -16,11 +19,13 @@ export const metadata: Metadata = {
 const marketplaceUrl =
   process.env.NEXT_PUBLIC_MARKETPLACE_URL ?? "http://localhost:3000";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const session = await auth();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="font-[family-name:var(--font-sans)] text-slate-950 antialiased">
@@ -33,6 +38,11 @@ export default function RootLayout({
               { href: "/dashboard", label: "Overview" },
               { href: marketplaceUrl, label: "Marketplace" },
             ]}
+            rightAccessory={
+              session?.user?.id ? (
+                <DashboardNavbarActions userId={session.user.id} />
+              ) : null
+            }
           />
           {children}
         </Providers>

@@ -5,6 +5,7 @@ import { signOut, useSession } from "next-auth/react";
 import { Navbar } from "@vendorly/ui";
 
 import { useCart } from "@/lib/cart";
+import { WebNotificationMenu } from "./web-notification-menu";
 
 export function WebNavbar({ dashboardUrl }: { dashboardUrl: string }) {
   const cart = useCart();
@@ -24,6 +25,9 @@ export function WebNavbar({ dashboardUrl }: { dashboardUrl: string }) {
       ]}
       rightAccessory={
         <div className="flex items-center gap-2.5">
+          {session?.user?.id ? (
+            <WebNotificationMenu userId={session.user.id} />
+          ) : null}
           {session?.user?.id ? (
             <button
               type="button"

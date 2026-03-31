@@ -22,6 +22,17 @@ const orderStatus = v.union(
   v.literal("cancelled"),
 );
 
+const notificationKind = v.union(
+  v.literal("chat_message"),
+  v.literal("order_created"),
+  v.literal("order_updated"),
+);
+
+const notificationRecipientRole = v.union(
+  v.literal("buyer"),
+  v.literal("seller"),
+);
+
 export default defineSchema({
   users: defineTable({
     authUserId: v.string(),
@@ -134,4 +145,17 @@ export default defineSchema({
     .index("by_store", ["storeId"])
     .index("by_viewer", ["viewerId"])
     .index("by_store_viewer", ["storeId", "viewerId"]),
+  notifications: defineTable({
+    body: v.string(),
+    href: v.string(),
+    kind: notificationKind,
+    recipientRole: notificationRecipientRole,
+    title: v.string(),
+    userId: v.string(),
+  }).index("by_user_id", ["userId"]),
+  notificationStates: defineTable({
+    lastReadAt: v.optional(v.number()),
+    unreadCount: v.number(),
+    userId: v.string(),
+  }).index("by_user_id", ["userId"]),
 });
