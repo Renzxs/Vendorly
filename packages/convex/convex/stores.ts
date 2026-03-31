@@ -10,7 +10,16 @@ export const getStores = queryGeneric({
   handler: async (ctx) => {
     const stores = await ctx.db.query("stores").collect();
 
-    return stores.sort((left, right) => left.name.localeCompare(right.name));
+    const storesWithFollowerCounts = await Promise.all(
+      stores.map(async (store) => ({
+        ...store,
+        ...(await getStoreFollowSummary(ctx, store._id)),
+      })),
+    );
+
+    return storesWithFollowerCounts.sort((left, right) =>
+      left.name.localeCompare(right.name),
+    );
   },
 });
 

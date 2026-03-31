@@ -84,6 +84,26 @@ export function MarketplaceShell() {
   const deferredSearchTerm = useDeferredValue(searchTerm);
 
   const featuredStores = useMemo(() => (stores ?? []).slice(0, 3), [stores]);
+  const mostFollowedStore = useMemo(() => {
+    return (stores ?? []).reduce<Store | null>((topStore, store) => {
+      if (!topStore) {
+        return store;
+      }
+
+      const topFollowerCount = topStore.followerCount ?? 0;
+      const storeFollowerCount = store.followerCount ?? 0;
+
+      if (storeFollowerCount > topFollowerCount) {
+        return store;
+      }
+
+      if (storeFollowerCount === topFollowerCount) {
+        return store.name.localeCompare(topStore.name) < 0 ? store : topStore;
+      }
+
+      return topStore;
+    }, null);
+  }, [stores]);
   const filteredProducts = useMemo(() => {
     return (products ?? []).filter((product) => {
       const matchesSearch =
@@ -160,10 +180,10 @@ export function MarketplaceShell() {
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-                  Featured stores
+                  Store spotlight
                 </p>
                 <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-950">
-                  Shop by brand
+                  Most followed store
                 </h2>
               </div>
               <a
@@ -173,31 +193,51 @@ export function MarketplaceShell() {
                 Become a seller
               </a>
             </div>
-            <div className="mt-5 space-y-3">
-              {(featuredStores.length > 0 ? featuredStores : (stores ?? []))
-                .slice(0, 3)
-                .map((store) => (
-                  <a
-                    key={store._id}
-                    href={`/store/${store.slug}`}
-                    className="block rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-slate-300"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="text-sm font-semibold text-slate-950">
-                          {store.name}
-                        </p>
-                        <p className="mt-2 text-sm leading-6 text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">
-                          {store.description}
-                        </p>
-                      </div>
-                      <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
-                        {store.layoutType}
-                      </span>
-                    </div>
-                  </a>
-                ))}
-            </div>
+            {mostFollowedStore ? (
+              <a
+                href={`/store/${mostFollowedStore.slug}`}
+                className="mt-5 block rounded-[1.5rem] border border-slate-200 bg-white p-5 transition hover:border-slate-300"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
+                      Top community pick
+                    </p>
+                    <p className="mt-2 text-xl font-semibold tracking-tight text-slate-950">
+                      {mostFollowedStore.name}
+                    </p>
+                  </div>
+                  <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
+                    {mostFollowedStore.layoutType}
+                  </span>
+                </div>
+                <p className="mt-4 text-sm leading-6 text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden">
+                  {mostFollowedStore.description}
+                </p>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                      Followers
+                    </p>
+                    <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+                      {mostFollowedStore.followerCount ?? 0}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+                      View
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                      Open this storefront and browse its products.
+                    </p>
+                  </div>
+                </div>
+              </a>
+            ) : (
+              <div className="mt-5 rounded-2xl border border-dashed border-slate-300 bg-white p-5 text-sm leading-6 text-slate-600">
+                Create a storefront to start building a most-followed seller.
+              </div>
+            )}
           </div>
         </div>
       </section>
