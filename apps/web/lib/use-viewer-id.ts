@@ -1,24 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-const VIEWER_STORAGE_KEY = "vendorly:viewer";
+import { useSession } from "next-auth/react";
 
 export function useViewerId() {
-  const [viewerId, setViewerId] = useState<string | null>(null);
+  const { data: session, status } = useSession();
 
-  useEffect(() => {
-    const existingViewerId = window.localStorage.getItem(VIEWER_STORAGE_KEY);
+  if (status === "loading") {
+    return null;
+  }
 
-    if (existingViewerId) {
-      setViewerId(existingViewerId);
-      return;
-    }
-
-    const nextViewerId = crypto.randomUUID();
-    window.localStorage.setItem(VIEWER_STORAGE_KEY, nextViewerId);
-    setViewerId(nextViewerId);
-  }, []);
-
-  return viewerId;
+  return session?.user?.id ?? null;
 }

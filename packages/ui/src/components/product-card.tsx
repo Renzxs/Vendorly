@@ -46,7 +46,7 @@ export function ProductCard({
         ("store" in product ? product.store?.themeColor : undefined)
       }
       className={cn(
-        "overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm",
+        "flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm",
         isList && "md:grid md:grid-cols-[200px_minmax(0,1fr)]",
         className,
       )}

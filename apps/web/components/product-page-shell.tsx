@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 
 import { api } from "@vendorly/convex";
 import { ThemeWrapper } from "@vendorly/ui";
@@ -15,6 +15,7 @@ import {
   type ProductReaction,
 } from "@vendorly/utils";
 
+import { toggleProductReactionAction } from "@/app/actions/buyer";
 import { useCart } from "@/lib/cart";
 import { useStoreChat } from "@/lib/store-chat";
 import { useViewerId } from "@/lib/use-viewer-id";
@@ -64,7 +65,6 @@ export function ProductPageShell({ productId }: { productId: string }) {
   const viewerId = useViewerId();
   const cart = useCart();
   const storeChat = useStoreChat();
-  const toggleReaction = useMutation(api.products.toggleProductReaction);
   const product = useQuery(api.products.getProductById, {
     productId,
     viewerId: viewerId ?? undefined,
@@ -100,19 +100,19 @@ export function ProductPageShell({ productId }: { productId: string }) {
   const totalReactions =
     product.reactionCount ?? getTotalReactionCount(product.reactionCounts);
   const isSoldOut = Boolean(product.isSoldOut);
+  const canBuyerAct = Boolean(viewerId);
 
   function handleReaction(reaction: ProductReaction) {
-    if (!viewerId) {
+    if (!canBuyerAct) {
       return;
     }
 
     startTransition(async () => {
       try {
         setError(null);
-        await toggleReaction({
+        await toggleProductReactionAction({
           productId: productRecordId,
           reaction,
-          viewerId,
         });
       } catch (mutationError) {
         setError(
@@ -235,6 +235,7 @@ export function ProductPageShell({ productId }: { productId: string }) {
                   ) : null}
                   <button
                     type="button"
+                    disabled={!canBuyerAct}
                     onClick={() =>
                       storeChat.openChat({
                         productId: productRecordId,
@@ -245,7 +246,11 @@ export function ProductPageShell({ productId }: { productId: string }) {
                         themeColor,
                       })
                     }
-                    className="inline-flex w-full justify-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
+                    className={`inline-flex w-full justify-center rounded-xl border px-4 py-2.5 text-sm font-medium transition ${
+                      !canBuyerAct
+                        ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
+                        : "border-slate-200 bg-slate-50 text-slate-900 hover:border-slate-300 hover:bg-white"
+                    }`}
                   >
                     Ask the seller
                   </button>
@@ -284,10 +289,10 @@ export function ProductPageShell({ productId }: { productId: string }) {
               <div className="mt-6 grid gap-3">
                 <button
                   type="button"
-                  disabled={isSoldOut}
+                  disabled={!canBuyerAct || isSoldOut}
                   onClick={() => cart.addItem(product, storeName)}
                   className={`inline-flex w-full items-center justify-center rounded-xl border px-5 py-3 text-sm font-medium transition ${
-                    isSoldOut
+                    !canBuyerAct || isSoldOut
                       ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
                       : "border-slate-950 bg-slate-950 text-white hover:bg-slate-800"
                   }`}
@@ -296,6 +301,7 @@ export function ProductPageShell({ productId }: { productId: string }) {
                 </button>
                 <button
                   type="button"
+                  disabled={!canBuyerAct}
                   onClick={() =>
                     storeChat.openChat({
                       productId: productRecordId,
@@ -306,7 +312,11 @@ export function ProductPageShell({ productId }: { productId: string }) {
                       themeColor,
                     })
                   }
-                  className="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
+                  className={`inline-flex w-full items-center justify-center rounded-xl border px-5 py-3 text-sm font-medium transition ${
+                    !canBuyerAct
+                      ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
+                      : "border-slate-200 bg-slate-50 text-slate-900 hover:border-slate-300 hover:bg-white"
+                  }`}
                 >
                   Chat seller
                 </button>
@@ -344,13 +354,13 @@ export function ProductPageShell({ productId }: { productId: string }) {
                     <button
                       key={option.value}
                       type="button"
-                      disabled={isPending || !viewerId}
+                      disabled={isPending || !canBuyerAct}
                       onClick={() => handleReaction(option.value)}
                       className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition ${
                         active
                           ? "border-slate-950 bg-slate-950 text-white"
                           : "border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 hover:bg-white"
-                      } ${isPending || !viewerId ? "cursor-not-allowed opacity-60" : ""}`}
+                      } ${isPending || !canBuyerAct ? "cursor-not-allowed opacity-60" : ""}`}
                       aria-label={`${option.label} reaction`}
                     >
                       <span aria-hidden="true" className="text-lg leading-none">
@@ -366,7 +376,7 @@ export function ProductPageShell({ productId }: { productId: string }) {
                   );
                 })}
               </div>
-              {!viewerId ? (
+              {!canBuyerAct ? (
                 <p className="mt-4 text-sm text-slate-500">
                   Sign in to react, add items to cart, and start a seller
                   conversation.

@@ -2,6 +2,7 @@ import { mutationGeneric, queryGeneric } from "convex/server";
 import { v } from "convex/values";
 
 import { internal } from "./_generated/api";
+import { internalMutation } from "./_generated/server";
 import { getStoreFollowSummary } from "./lib/social";
 import { syncUserRecordAndNotify } from "./lib/users";
 
@@ -181,7 +182,7 @@ export const updateStore = mutationGeneric({
   },
 });
 
-export const toggleStoreFollow = mutationGeneric({
+export const toggleStoreFollow = internalMutation({
   args: {
     storeId: v.id("stores"),
     viewerId: v.string(),

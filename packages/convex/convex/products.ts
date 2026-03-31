@@ -1,6 +1,7 @@
 import { mutationGeneric, queryGeneric } from "convex/server";
 import { v } from "convex/values";
 
+import { internalMutation } from "./_generated/server";
 import { getFollowedStoreIds, getProductReactionSummary } from "./lib/social";
 
 async function hydrateProduct(ctx: any, product: any) {
@@ -230,7 +231,7 @@ export const updateProduct = mutationGeneric({
   },
 });
 
-export const toggleProductReaction = mutationGeneric({
+export const toggleProductReaction = internalMutation({
   args: {
     productId: v.id("products"),
     reaction: v.union(v.literal("love"), v.literal("fire"), v.literal("wow")),

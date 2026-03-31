@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import Link from "next/link";
 
 import { api } from "@vendorly/convex";
@@ -13,6 +13,7 @@ import {
   type Store,
 } from "@vendorly/utils";
 
+import { toggleStoreFollowAction } from "@/app/actions/buyer";
 import { useStoreChat } from "@/lib/store-chat";
 import { useViewerId } from "@/lib/use-viewer-id";
 import { ProductSocialCard } from "./product-social-card";
@@ -118,12 +119,12 @@ export function StorefrontShell({ slug }: { slug: string }) {
     slug,
     viewerId: viewerId ?? undefined,
   }) as Store | null | undefined;
-  const toggleStoreFollow = useMutation(api.stores.toggleStoreFollow);
   const dashboardUrl =
     process.env.NEXT_PUBLIC_DASHBOARD_URL ?? "http://localhost:3001/dashboard";
   const [isPending, startTransition] = useTransition();
   const [followError, setFollowError] = useState<string | null>(null);
   const socialLinks = store ? getStoreSocialLinks(store) : [];
+  const canBuyerAct = Boolean(viewerId);
 
   if (store === undefined) {
     return (
@@ -158,7 +159,7 @@ export function StorefrontShell({ slug }: { slug: string }) {
   }
 
   function handleToggleFollow() {
-    if (!viewerId || !store) {
+    if (!canBuyerAct || !store) {
       return;
     }
 
@@ -167,9 +168,8 @@ export function StorefrontShell({ slug }: { slug: string }) {
     startTransition(async () => {
       try {
         setFollowError(null);
-        await toggleStoreFollow({
+        await toggleStoreFollowAction({
           storeId,
-          viewerId,
         });
       } catch (error) {
         setFollowError(
@@ -200,6 +200,7 @@ export function StorefrontShell({ slug }: { slug: string }) {
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
+              disabled={!canBuyerAct}
               onClick={() =>
                 storeChat.openChat({
                   storeId: store._id,
@@ -208,19 +209,23 @@ export function StorefrontShell({ slug }: { slug: string }) {
                   themeColor: store.themeColor,
                 })
               }
-              className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900 shadow-sm transition hover:border-slate-300"
+              className={`inline-flex items-center rounded-xl border px-4 py-2.5 text-sm font-medium shadow-sm transition ${
+                !canBuyerAct
+                  ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
+                  : "border-slate-200 bg-white text-slate-900 hover:border-slate-300"
+              }`}
             >
               Chat with store
             </button>
             <button
               type="button"
-              disabled={isPending || !viewerId}
+              disabled={isPending || !canBuyerAct}
               onClick={handleToggleFollow}
               className={`inline-flex items-center rounded-xl border px-4 py-2.5 text-sm font-medium shadow-sm transition ${
                 store.isFollowed
                   ? "border-slate-950 bg-slate-950 text-white"
                   : "border-slate-200 bg-white text-slate-900 hover:border-slate-300"
-              } ${isPending || !viewerId ? "cursor-not-allowed opacity-60" : ""}`}
+              } ${isPending || !canBuyerAct ? "cursor-not-allowed opacity-60" : ""}`}
             >
               {store.isFollowed ? "Following" : "Follow store"}
             </button>
@@ -317,6 +322,7 @@ export function StorefrontShell({ slug }: { slug: string }) {
               <div className="mt-5 grid gap-3">
                 <button
                   type="button"
+                  disabled={!canBuyerAct}
                   onClick={() =>
                     storeChat.openChat({
                       storeId: store._id,
@@ -325,23 +331,32 @@ export function StorefrontShell({ slug }: { slug: string }) {
                       themeColor: store.themeColor,
                     })
                   }
-                  className="inline-flex w-full justify-center rounded-xl border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
+                  className={`inline-flex w-full justify-center rounded-xl border px-5 py-3 text-sm font-medium transition ${
+                    !canBuyerAct
+                      ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
+                      : "border-slate-200 bg-slate-50 text-slate-900 hover:border-slate-300 hover:bg-white"
+                  }`}
                 >
                   Ask a question
                 </button>
                 <button
                   type="button"
-                  disabled={isPending || !viewerId}
+                  disabled={isPending || !canBuyerAct}
                   onClick={handleToggleFollow}
                   className={`inline-flex w-full justify-center rounded-xl border px-5 py-3 text-sm font-medium transition ${
                     store.isFollowed
                       ? "border-slate-950 bg-slate-950 text-white"
                       : "border-slate-200 bg-slate-50 text-slate-900 hover:border-slate-300 hover:bg-white"
-                  } ${isPending || !viewerId ? "cursor-not-allowed opacity-60" : ""}`}
+                  } ${isPending || !canBuyerAct ? "cursor-not-allowed opacity-60" : ""}`}
                 >
                   {store.isFollowed ? "Following store" : "Follow store"}
                 </button>
               </div>
+              {!canBuyerAct ? (
+                <p className="mt-3 text-sm text-slate-500">
+                  Sign in to follow stores and contact sellers.
+                </p>
+              ) : null}
               {followError ? (
                 <p className="mt-3 text-sm text-rose-600">{followError}</p>
               ) : null}
