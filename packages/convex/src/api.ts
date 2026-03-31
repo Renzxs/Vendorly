@@ -1,6 +1,9 @@
 import { anyApi } from "convex/server";
 
 export const api = anyApi as {
+  assistant: {
+    askStoreAssistant: any;
+  };
   chat: {
     getOwnerStoreChatMessages: any;
     getOwnerStoreChatThreads: any;

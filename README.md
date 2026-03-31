@@ -121,6 +121,7 @@ The project is built as a Turborepo monorepo with Next.js, Convex, TypeScript, a
 - Multiple stores per authenticated seller
 - Store customization with theme color, banner image, logo image, layout switching, and social links
 - Product creation, editing, sold-out states, and social reactions
+- AI assistant on store and product pages backed by GitHub Models
 - Cart, checkout, and buyer order history/tracking
 - Seller dashboard for catalog management, customer conversations, and order workflows
 - Realtime Convex queries and modular mutations
@@ -225,13 +226,16 @@ AUTH_GOOGLE_ID=your_google_oauth_client_id
 AUTH_GOOGLE_SECRET=your_google_oauth_client_secret
 ```
 
-For backend Discord alerts, add this to `packages/convex/.env.local`:
+For backend integrations, add these to `packages/convex/.env.local`:
 
 ```bash
 DISCORD_WEBHOOK_URL=your_discord_webhook_url
+GITHUB_TOKEN=your_github_models_token
+GITHUB_MODELS_MODEL=deepseek/DeepSeek-V3-0324
+GITHUB_MODELS_ENDPOINT=https://models.github.ai/inference
 ```
 
-For hosted deployments, set `DISCORD_WEBHOOK_URL` on the Convex deployment as well, since these notifications run from Convex rather than Vercel.
+For hosted deployments, set `DISCORD_WEBHOOK_URL`, `GITHUB_TOKEN`, and any optional GitHub Models overrides on the Convex deployment as well, since these integrations run from Convex rather than Vercel.
 
 6. For local OAuth callbacks, register:
 

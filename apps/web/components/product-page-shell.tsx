@@ -20,6 +20,7 @@ import { getActionErrorMessage } from "@/lib/action-errors";
 import { useCart } from "@/lib/cart";
 import { useStoreChat } from "@/lib/store-chat";
 import { useViewerId } from "@/lib/use-viewer-id";
+import { StoreAiAssistant } from "./store-ai-assistant";
 
 function ProductPageLoading() {
   return (
@@ -390,6 +391,13 @@ export function ProductPageShell({ productId }: { productId: string }) {
           </aside>
         </section>
       </main>
+      <StoreAiAssistant
+        productId={product._id}
+        productTitle={product.title}
+        storeId={product.storeId}
+        storeName={storeName}
+        themeColor={themeColor}
+      />
     </ThemeWrapper>
   );
 }

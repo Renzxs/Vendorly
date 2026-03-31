@@ -8,6 +8,8 @@
  * @module
  */
 
+import type * as assistant from "../assistant.js";
+import type * as assistantContext from "../assistantContext.js";
 import type * as chat from "../chat.js";
 import type * as discord from "../discord.js";
 import type * as lib_notifications from "../lib/notifications.js";
@@ -27,6 +29,8 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  assistant: typeof assistant;
+  assistantContext: typeof assistantContext;
   chat: typeof chat;
   discord: typeof discord;
   "lib/notifications": typeof lib_notifications;

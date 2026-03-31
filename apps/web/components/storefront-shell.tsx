@@ -18,6 +18,7 @@ import { getActionErrorMessage } from "@/lib/action-errors";
 import { useStoreChat } from "@/lib/store-chat";
 import { useViewerId } from "@/lib/use-viewer-id";
 import { ProductSocialCard } from "./product-social-card";
+import { StoreAiAssistant } from "./store-ai-assistant";
 
 function StorefrontLoading() {
   return (
@@ -384,6 +385,12 @@ export function StorefrontShell({ slug }: { slug: string }) {
           </aside>
         </section>
       </main>
+      <StoreAiAssistant
+        storeDescription={store.description}
+        storeId={store._id}
+        storeName={store.name}
+        themeColor={store.themeColor}
+      />
     </ThemeWrapper>
   );
 }
