@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 
 import { cn, type NotificationItem } from "@vendorly/utils";
@@ -25,6 +26,9 @@ type NotificationCenterProps = {
   notifications?: NotificationItem[];
   onMarkAllRead?: () => Promise<void> | void;
   title?: string;
+  triggerAriaLabel?: string;
+  triggerClassName?: string;
+  triggerContent?: ReactNode;
   unreadCount?: number;
 };
 
@@ -34,6 +38,9 @@ export function NotificationCenter({
   notifications = [],
   onMarkAllRead,
   title = "Notifications",
+  triggerAriaLabel,
+  triggerClassName,
+  triggerContent,
   unreadCount = 0,
 }: NotificationCenterProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -167,19 +174,29 @@ export function NotificationCenter({
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white"
+        aria-expanded={isOpen}
+        aria-haspopup="dialog"
+        aria-label={triggerAriaLabel}
+        className={cn(
+          "inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-900 transition hover:border-slate-300 hover:bg-white",
+          triggerClassName,
+        )}
       >
-        <span>{title}</span>
-        <span
-          className={cn(
-            "rounded-full border px-2 py-0.5 text-xs font-semibold",
-            unreadCount > 0
-              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-              : "border-slate-200 bg-white text-slate-500",
-          )}
-        >
-          {unreadCount}
-        </span>
+        {triggerContent ?? (
+          <>
+            <span>{title}</span>
+            <span
+              className={cn(
+                "rounded-full border px-2 py-0.5 text-xs font-semibold",
+                unreadCount > 0
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                  : "border-slate-200 bg-white text-slate-500",
+              )}
+            >
+              {unreadCount}
+            </span>
+          </>
+        )}
       </button>
 
       {isOpen ? (
