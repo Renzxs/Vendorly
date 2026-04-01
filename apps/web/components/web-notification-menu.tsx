@@ -18,22 +18,29 @@ function BellIcon({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M9 18H15"
+        d="M8.5 17.75H15.5"
         stroke="currentColor"
         strokeLinecap="round"
-        strokeWidth="2"
+        strokeWidth="2.2"
       />
       <path
-        d="M10.5 21H13.5"
+        d="M10 17.75C10.35 18.77 11.24 19.5 12.25 19.5C13.26 19.5 14.15 18.77 14.5 17.75"
         stroke="currentColor"
         strokeLinecap="round"
-        strokeWidth="2"
+        strokeWidth="2.2"
       />
       <path
-        d="M6.75 9.25C6.75 6.35051 9.10051 4 12 4C14.8995 4 17.25 6.35051 17.25 9.25V12.0463C17.25 12.6305 17.4204 13.2019 17.7405 13.6906L18.7447 15.2244C19.2388 15.9792 18.698 17 17.7958 17H6.2042C5.30203 17 4.7612 15.9792 5.25527 15.2244L6.25947 13.6906C6.57958 13.2019 6.75 12.6305 6.75 12.0463V9.25Z"
+        d="M7.25 9.5C7.25 6.87665 9.37665 4.75 12 4.75C14.6234 4.75 16.75 6.87665 16.75 9.5V11.6129C16.75 12.2511 16.9382 12.8751 17.2911 13.4068L18.1938 14.7667C18.8447 15.7474 18.1417 17.068 16.9647 17.068H7.03527C5.85834 17.068 5.15531 15.7474 5.8062 14.7667L6.70888 13.4068C7.06176 12.8751 7.25 12.2511 7.25 11.6129V9.5Z"
         stroke="currentColor"
+        strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="2"
+        strokeWidth="2.2"
+      />
+      <path
+        d="M12 4.75V3.8"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="2.2"
       />
     </svg>
   );
@@ -75,7 +82,7 @@ export function WebNotificationMenu({
         iconOnly ? (
           <>
             <span className="sr-only">Notifications</span>
-            <BellIcon className="h-[1.35rem] w-[1.35rem]" />
+            <BellIcon className="h-6 w-6" />
             <span
               className={`absolute -right-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full border px-1.5 text-[0.65rem] font-semibold leading-5 ${
                 unreadCount > 0

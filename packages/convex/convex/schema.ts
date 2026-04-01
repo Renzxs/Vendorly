@@ -133,6 +133,12 @@ export default defineSchema({
     .index("by_product", ["productId"])
     .index("by_viewer", ["viewerId"])
     .index("by_product_viewer", ["productId", "viewerId"]),
+  feedPosts: defineTable({
+    body: v.string(),
+    viewerId: v.string(),
+    viewerImage: v.optional(v.string()),
+    viewerName: v.optional(v.string()),
+  }).index("by_viewer", ["viewerId"]),
   chatMessages: defineTable({
     body: v.string(),
     productId: v.optional(v.id("products")),

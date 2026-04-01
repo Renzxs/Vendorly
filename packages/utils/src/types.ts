@@ -103,6 +103,15 @@ export interface ChatMessage {
   viewerName?: string;
 }
 
+export interface FeedPost {
+  _id: string;
+  _creationTime?: number;
+  body: string;
+  viewerId: string;
+  viewerImage?: string;
+  viewerName?: string;
+}
+
 export interface ChatThread {
   lastMessageAt?: number;
   lastMessageBody?: string;

@@ -19,6 +19,7 @@ async function requireAuthenticatedBuyer() {
   return {
     email: session.user.email ?? undefined,
     id: session.user.id,
+    image: session.user.image ?? undefined,
     name: session.user.name ?? undefined,
   };
 }
@@ -104,6 +105,32 @@ export async function sendViewerStoreMessageAction(input: {
     return {
       success: false as const,
       message: getActionErrorMessage(error, "Unable to send message."),
+    };
+  }
+}
+
+export async function createFeedPostAction(input: { body: string }) {
+  try {
+    const currentUser = await requireAuthenticatedBuyer();
+
+    await fetchMutation(
+      api.feed.createFeedPost,
+      {
+        body: input.body,
+        viewerId: currentUser.id,
+        viewerImage: currentUser.image,
+        viewerName: currentUser.name ?? currentUser.email,
+      },
+      getConvexServerOptions(),
+    );
+
+    return {
+      success: true as const,
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      message: getActionErrorMessage(error, "Unable to publish your post."),
     };
   }
 }

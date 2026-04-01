@@ -72,6 +72,35 @@ export function getInitials(name: string) {
     .join("");
 }
 
+const relativeTimeFormatter = new Intl.RelativeTimeFormat("en", {
+  numeric: "auto",
+});
+
+export function formatRelativeTime(value?: number, now = Date.now()) {
+  if (!value) {
+    return "";
+  }
+
+  const diff = value - now;
+  const absoluteDiff = Math.abs(diff);
+  const ranges: Array<[Intl.RelativeTimeFormatUnit, number]> = [
+    ["year", 1000 * 60 * 60 * 24 * 365],
+    ["month", 1000 * 60 * 60 * 24 * 30],
+    ["week", 1000 * 60 * 60 * 24 * 7],
+    ["day", 1000 * 60 * 60 * 24],
+    ["hour", 1000 * 60 * 60],
+    ["minute", 1000 * 60],
+  ];
+
+  for (const [unit, unitMs] of ranges) {
+    if (absoluteDiff >= unitMs) {
+      return relativeTimeFormatter.format(Math.round(diff / unitMs), unit);
+    }
+  }
+
+  return "just now";
+}
+
 export function parseImageUrls(input: string) {
   return Array.from(
     new Set(

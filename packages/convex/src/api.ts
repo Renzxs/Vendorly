@@ -4,6 +4,11 @@ export const api = anyApi as {
   assistant: {
     askStoreAssistant: any;
   };
+  feed: {
+    createFeedPost: any;
+    getPaginatedProductFeed: any;
+    getRecentFeedPosts: any;
+  };
   chat: {
     getOwnerStoreChatMessages: any;
     getOwnerStoreChatThreads: any;
