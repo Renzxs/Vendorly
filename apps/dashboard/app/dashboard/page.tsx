@@ -71,11 +71,8 @@ export default async function DashboardPage({
         convexOptions,
       )) as ChatThread[])
     : [];
-  const selectedChatViewerId = storeChatThreads.find(
-    (thread) => thread.viewerId === requestedChatViewerId,
-  )
-    ? requestedChatViewerId
-    : storeChatThreads[0]?.viewerId;
+  const selectedChatViewerId =
+    requestedChatViewerId ?? storeChatThreads[0]?.viewerId;
   const selectedChatMessages =
     selectedStore && selectedChatViewerId
       ? ((await fetchQuery(

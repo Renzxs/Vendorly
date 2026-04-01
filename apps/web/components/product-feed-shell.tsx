@@ -5,11 +5,12 @@ import { type ReactNode, useEffect, useRef } from "react";
 import { usePaginatedQuery, useQuery } from "convex/react";
 
 import { api } from "@vendorly/convex";
-import type { FeedPost, MarketplaceProduct } from "@vendorly/utils";
+import type { FeedPost, MarketplaceProduct, Store } from "@vendorly/utils";
 
 import { FeedPostCard } from "./feed-post-card";
 import { FeedPostComposer } from "./feed-post-composer";
 import { ProductSocialCard } from "./product-social-card";
+import { buildSellerDashboardChatHref } from "@/lib/seller-chat";
 import { useViewerId } from "@/lib/use-viewer-id";
 
 const INITIAL_FEED_BATCH = 4;
@@ -102,7 +103,16 @@ export function ProductFeedShell() {
   const loadMoreAnchorRef = useRef<HTMLDivElement | null>(null);
   const recentPosts = useQuery(api.feed.getRecentFeedPosts, {
     limit: 4,
+    viewerId: viewerId ?? undefined,
   }) as FeedPost[] | undefined;
+  const ownedStores = useQuery(
+    api.stores.getStoresByOwner,
+    viewerId
+      ? {
+          ownerId: viewerId,
+        }
+      : "skip",
+  ) as Store[] | undefined;
   const { loadMore, results, status } = usePaginatedQuery(
     api.feed.getPaginatedProductFeed,
     {
@@ -113,6 +123,7 @@ export function ProductFeedShell() {
     },
   );
   const products = results as MarketplaceProduct[];
+  const primaryOwnedStore = ownedStores?.[0];
   const followedDropsLoaded = products.filter(
     (product) => product.fromFollowedStore,
   ).length;
@@ -202,7 +213,19 @@ export function ProductFeedShell() {
             ) : recentPosts.length > 0 ? (
               <div className="space-y-4">
                 {recentPosts.map((post) => (
-                  <FeedPostCard key={post._id} post={post} />
+                  <FeedPostCard
+                    key={post._id}
+                    post={post}
+                    sellerChatHref={
+                      primaryOwnedStore && post.viewerId !== viewerId
+                        ? buildSellerDashboardChatHref(
+                            primaryOwnedStore._id,
+                            post.viewerId,
+                          )
+                        : undefined
+                    }
+                    viewerId={viewerId}
+                  />
                 ))}
               </div>
             ) : (

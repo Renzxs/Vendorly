@@ -139,6 +139,14 @@ export default defineSchema({
     viewerImage: v.optional(v.string()),
     viewerName: v.optional(v.string()),
   }).index("by_viewer", ["viewerId"]),
+  feedPostReactions: defineTable({
+    postId: v.id("feedPosts"),
+    reaction: v.union(v.literal("love"), v.literal("fire"), v.literal("wow")),
+    viewerId: v.string(),
+  })
+    .index("by_post", ["postId"])
+    .index("by_viewer", ["viewerId"])
+    .index("by_post_viewer", ["postId", "viewerId"]),
   chatMessages: defineTable({
     body: v.string(),
     productId: v.optional(v.id("products")),

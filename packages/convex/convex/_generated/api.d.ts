@@ -13,6 +13,7 @@ import type * as assistantContext from "../assistantContext.js";
 import type * as chat from "../chat.js";
 import type * as discord from "../discord.js";
 import type * as feed from "../feed.js";
+import type * as lib_feed from "../lib/feed.js";
 import type * as lib_notifications from "../lib/notifications.js";
 import type * as lib_products from "../lib/products.js";
 import type * as lib_social from "../lib/social.js";
@@ -36,6 +37,7 @@ declare const fullApi: ApiFromModules<{
   chat: typeof chat;
   discord: typeof discord;
   feed: typeof feed;
+  "lib/feed": typeof lib_feed;
   "lib/notifications": typeof lib_notifications;
   "lib/products": typeof lib_products;
   "lib/social": typeof lib_social;

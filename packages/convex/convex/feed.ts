@@ -5,17 +5,33 @@ import {
 } from "convex/server";
 import { v } from "convex/values";
 
+import { hydrateFeedPost } from "./lib/feed";
 import { hydrateMarketplaceProduct } from "./lib/products";
 import { getFollowedStoreIds } from "./lib/social";
 
 export const getRecentFeedPosts = queryGeneric({
   args: {
+    authorViewerId: v.optional(v.string()),
     limit: v.optional(v.number()),
+    viewerId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const limit = Math.min(Math.max(Math.floor(args.limit ?? 4), 1), 8);
+    const posts = args.authorViewerId
+      ? await ctx.db
+          .query("feedPosts")
+          .withIndex("by_viewer", (query) =>
+            query.eq("viewerId", args.authorViewerId!),
+          )
+          .order("desc")
+          .take(limit)
+      : await ctx.db.query("feedPosts").order("desc").take(limit);
 
-    return await ctx.db.query("feedPosts").order("desc").take(limit);
+    return await Promise.all(
+      posts.map(
+        async (post) => await hydrateFeedPost(ctx, post, args.viewerId),
+      ),
+    );
   },
 });
 
@@ -43,6 +59,56 @@ export const createFeedPost = mutationGeneric({
       viewerImage: args.viewerImage?.trim() || undefined,
       viewerName: args.viewerName?.trim() || undefined,
     });
+  },
+});
+
+export const toggleFeedPostReaction = mutationGeneric({
+  args: {
+    postId: v.id("feedPosts"),
+    reaction: v.union(v.literal("love"), v.literal("fire"), v.literal("wow")),
+    viewerId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const post = await ctx.db.get(args.postId);
+
+    if (!post) {
+      throw new Error("Post not found.");
+    }
+
+    const existingReaction = await ctx.db
+      .query("feedPostReactions")
+      .withIndex("by_post", (query) => query.eq("postId", args.postId))
+      .collect()
+      .then((reactions) =>
+        reactions.find((reaction) => reaction.viewerId === args.viewerId),
+      );
+
+    if (existingReaction?.reaction === args.reaction) {
+      await ctx.db.delete(existingReaction._id);
+      return {
+        viewerReaction: undefined,
+      };
+    }
+
+    if (existingReaction) {
+      await ctx.db.patch(existingReaction._id, {
+        reaction: args.reaction,
+      });
+
+      return {
+        viewerReaction: args.reaction,
+      };
+    }
+
+    await ctx.db.insert("feedPostReactions", {
+      postId: args.postId,
+      reaction: args.reaction,
+      viewerId: args.viewerId,
+    });
+
+    return {
+      viewerReaction: args.reaction,
+    };
   },
 });
 

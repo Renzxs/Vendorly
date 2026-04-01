@@ -38,6 +38,7 @@ import {
   type OrderStatus,
   parseImageUrls,
   slugify,
+  type VendorlyUser,
   type Product,
   type ProductFormValues,
   type Store,
@@ -411,12 +412,9 @@ export function DashboardShell({
   ) as ChatThread[] | undefined;
   const resolvedStoreChatThreads = liveStoreChatThreads ?? storeChatThreads;
   const activeChatViewerId =
-    requestedChatViewerId &&
-    resolvedStoreChatThreads.some(
-      (thread) => thread.viewerId === requestedChatViewerId,
-    )
-      ? requestedChatViewerId
-      : (resolvedStoreChatThreads[0]?.viewerId ?? selectedChatViewerId);
+    requestedChatViewerId ??
+    resolvedStoreChatThreads[0]?.viewerId ??
+    selectedChatViewerId;
   const liveSelectedChatMessages = useQuery(
     api.chat.getOwnerStoreChatMessages,
     selectedStore && activeChatViewerId
@@ -437,6 +435,21 @@ export function DashboardShell({
       ),
     [activeChatViewerId, resolvedStoreChatThreads],
   );
+  const activeChatUser = useQuery(
+    api.users.getUserByAuthUserId,
+    activeChatViewerId
+      ? {
+          authUserId: activeChatViewerId,
+        }
+      : "skip",
+  ) as VendorlyUser | null | undefined;
+  const activeChatDisplayName =
+    selectedChatThread?.viewerName ??
+    activeChatUser?.name ??
+    activeChatUser?.email ??
+    (activeChatViewerId
+      ? `Guest ${activeChatViewerId.slice(0, 4)}`
+      : "Select a conversation");
   const previewThemeColor = normalizeThemeColor(storeForm.themeColor);
   const previewSlug = slugify(storeForm.slug || storeForm.name);
   const previewUrl = previewSlug
@@ -1742,7 +1755,8 @@ export function DashboardShell({
                         and reply as the seller.
                       </p>
                     </div>
-                  ) : resolvedStoreChatThreads.length === 0 ? (
+                  ) : resolvedStoreChatThreads.length === 0 &&
+                    !activeChatViewerId ? (
                     <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
                       <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
                         No chats yet
@@ -1755,64 +1769,76 @@ export function DashboardShell({
                   ) : (
                     <div className="grid gap-6 xl:grid-cols-[260px_minmax(0,1fr)]">
                       <div className="space-y-3">
-                        {resolvedStoreChatThreads.map((thread) => {
-                          const active = thread.viewerId === activeChatViewerId;
+                        {resolvedStoreChatThreads.length > 0 ? (
+                          resolvedStoreChatThreads.map((thread) => {
+                            const active = thread.viewerId === activeChatViewerId;
 
-                          return (
-                            <button
-                              key={thread.viewerId}
-                              type="button"
-                              onClick={() => navigateToChat(thread.viewerId)}
-                              className={`w-full rounded-2xl border p-4 text-left transition ${
-                                active
-                                  ? "border-slate-950 bg-slate-950 text-white"
-                                  : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white"
-                              }`}
-                            >
-                              <div className="flex items-start justify-between gap-3">
-                                <div>
-                                  <p className="text-sm font-semibold">
-                                    {thread.viewerName ||
-                                      `Guest ${thread.viewerId.slice(0, 4)}`}
-                                  </p>
-                                  <p
-                                    className={`mt-1 text-xs uppercase tracking-[0.2em] ${
-                                      active
-                                        ? "text-white/60"
-                                        : "text-slate-400"
-                                    }`}
-                                  >
-                                    {thread.messageCount} message
-                                    {thread.messageCount === 1 ? "" : "s"}
-                                  </p>
-                                </div>
-                                <span
-                                  className={`text-[0.68rem] ${
-                                    active ? "text-white/65" : "text-slate-400"
-                                  }`}
-                                >
-                                  {formatChatTimestamp(thread.lastMessageAt)}
-                                </span>
-                              </div>
-                              {thread.lastProductTitle ? (
-                                <p
-                                  className={`mt-3 text-[0.68rem] font-semibold uppercase tracking-[0.22em] ${
-                                    active ? "text-white/65" : "text-slate-400"
-                                  }`}
-                                >
-                                  {thread.lastProductTitle}
-                                </p>
-                              ) : null}
-                              <p
-                                className={`mt-2 text-sm leading-7 ${
-                                  active ? "text-white/80" : "text-slate-600"
+                            return (
+                              <button
+                                key={thread.viewerId}
+                                type="button"
+                                onClick={() => navigateToChat(thread.viewerId)}
+                                className={`w-full rounded-2xl border p-4 text-left transition ${
+                                  active
+                                    ? "border-slate-950 bg-slate-950 text-white"
+                                    : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white"
                                 }`}
                               >
-                                {thread.lastMessageBody}
-                              </p>
-                            </button>
-                          );
-                        })}
+                                <div className="flex items-start justify-between gap-3">
+                                  <div>
+                                    <p className="text-sm font-semibold">
+                                      {thread.viewerName ||
+                                        `Guest ${thread.viewerId.slice(0, 4)}`}
+                                    </p>
+                                    <p
+                                      className={`mt-1 text-xs uppercase tracking-[0.2em] ${
+                                        active
+                                          ? "text-white/60"
+                                          : "text-slate-400"
+                                      }`}
+                                    >
+                                      {thread.messageCount} message
+                                      {thread.messageCount === 1 ? "" : "s"}
+                                    </p>
+                                  </div>
+                                  <span
+                                    className={`text-[0.68rem] ${
+                                      active ? "text-white/65" : "text-slate-400"
+                                    }`}
+                                  >
+                                    {formatChatTimestamp(thread.lastMessageAt)}
+                                  </span>
+                                </div>
+                                {thread.lastProductTitle ? (
+                                  <p
+                                    className={`mt-3 text-[0.68rem] font-semibold uppercase tracking-[0.22em] ${
+                                      active ? "text-white/65" : "text-slate-400"
+                                    }`}
+                                  >
+                                    {thread.lastProductTitle}
+                                  </p>
+                                ) : null}
+                                <p
+                                  className={`mt-2 text-sm leading-7 ${
+                                    active ? "text-white/80" : "text-slate-600"
+                                  }`}
+                                >
+                                  {thread.lastMessageBody}
+                                </p>
+                              </button>
+                            );
+                          })
+                        ) : (
+                          <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm leading-6 text-slate-600">
+                            <p className="font-semibold text-slate-950">
+                              Starting a new chat with {activeChatDisplayName}
+                            </p>
+                            <p className="mt-2">
+                              Send the first seller reply here and this buyer
+                              will appear in your conversation list.
+                            </p>
+                          </div>
+                        )}
                       </div>
 
                       <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white">
@@ -1821,10 +1847,7 @@ export function DashboardShell({
                             Active conversation
                           </p>
                           <h3 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
-                            {selectedChatThread?.viewerName ||
-                              (activeChatViewerId
-                                ? `Guest ${activeChatViewerId.slice(0, 4)}`
-                                : "Select a conversation")}
+                            {activeChatDisplayName}
                           </h3>
                           <p className="mt-2 text-sm leading-7 text-slate-600">
                             Reply from your seller dashboard. New buyer messages
@@ -1886,11 +1909,14 @@ export function DashboardShell({
                           <div className="px-5 py-6">
                             <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
                               <h3 className="font-[family-name:var(--font-display)] text-4xl leading-none tracking-tight text-slate-950">
-                                Select a chat
+                                {activeChatViewerId
+                                  ? "Start the conversation"
+                                  : "Select a chat"}
                               </h3>
                               <p className="mt-3 text-sm leading-7 text-slate-600">
-                                Choose a conversation to read the thread and
-                                reply from here.
+                                {activeChatViewerId
+                                  ? `Send the first reply to ${activeChatDisplayName} from here.`
+                                  : "Choose a conversation to read the thread and reply from here."}
                               </p>
                             </div>
                           </div>

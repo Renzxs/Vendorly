@@ -59,3 +59,30 @@ export async function getProductReactionSummary(
     viewerReaction,
   };
 }
+
+export async function getFeedPostReactionSummary(
+  ctx: any,
+  postId: any,
+  viewerId?: string,
+) {
+  const reactions = await ctx.db
+    .query("feedPostReactions")
+    .withIndex("by_post", (query: any) => query.eq("postId", postId))
+    .collect();
+
+  const reactionCounts = createReactionCounts();
+
+  for (const reaction of reactions) {
+    reactionCounts[reaction.reaction as ProductReaction] += 1;
+  }
+
+  const viewerReaction = viewerId
+    ? reactions.find((reaction: any) => reaction.viewerId === viewerId)?.reaction
+    : undefined;
+
+  return {
+    reactionCount: reactions.length,
+    reactionCounts,
+    viewerReaction,
+  };
+}

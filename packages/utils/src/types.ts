@@ -107,9 +107,19 @@ export interface FeedPost {
   _id: string;
   _creationTime?: number;
   body: string;
+  reactionCounts?: Record<ProductReaction, number>;
+  reactionCount?: number;
   viewerId: string;
   viewerImage?: string;
+  viewerReaction?: ProductReaction;
   viewerName?: string;
+}
+
+export interface PublicUserProfile {
+  posts: FeedPost[];
+  products: MarketplaceProduct[];
+  stores: Store[];
+  user: VendorlyUser;
 }
 
 export interface ChatThread {

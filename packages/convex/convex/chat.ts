@@ -189,6 +189,17 @@ export const sendSellerStoreMessage = mutationGeneric({
       throw new Error("You can only reply to chats in your own store.");
     }
 
+    const viewer = await ctx.db
+      .query("users")
+      .withIndex("by_auth_user_id", (query) =>
+        query.eq("authUserId", args.viewerId),
+      )
+      .unique();
+
+    if (!viewer) {
+      throw new Error("Buyer not found.");
+    }
+
     const body = args.body.trim();
 
     if (!body) {
@@ -212,7 +223,7 @@ export const sendSellerStoreMessage = mutationGeneric({
       kind: "chat_message",
       recipientRole: "buyer",
       title: `${store.name} replied to your chat`,
-      userId: args.viewerId,
+      userId: viewer.authUserId,
     });
 
     return messageId;

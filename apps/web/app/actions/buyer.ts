@@ -135,6 +135,34 @@ export async function createFeedPostAction(input: { body: string }) {
   }
 }
 
+export async function toggleFeedPostReactionAction(input: {
+  postId: string;
+  reaction: ProductReaction;
+}) {
+  try {
+    const currentUser = await requireAuthenticatedBuyer();
+
+    await fetchMutation(
+      api.feed.toggleFeedPostReaction,
+      {
+        postId: input.postId,
+        reaction: input.reaction,
+        viewerId: currentUser.id,
+      },
+      getConvexServerOptions(),
+    );
+
+    return {
+      success: true as const,
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      message: getActionErrorMessage(error, "Unable to save your reaction."),
+    };
+  }
+}
+
 export async function markBuyerNotificationsReadAction() {
   try {
     const currentUser = await requireAuthenticatedBuyer();

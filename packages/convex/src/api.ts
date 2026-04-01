@@ -8,6 +8,7 @@ export const api = anyApi as {
     createFeedPost: any;
     getPaginatedProductFeed: any;
     getRecentFeedPosts: any;
+    toggleFeedPostReaction: any;
   };
   chat: {
     getOwnerStoreChatMessages: any;
@@ -48,6 +49,7 @@ export const api = anyApi as {
     updateStore: any;
   };
   users: {
+    getPublicProfile: any;
     getUserByAuthUserId: any;
     getUserByEmail: any;
     syncUser: any;
