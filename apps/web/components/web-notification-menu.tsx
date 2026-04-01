@@ -21,19 +21,19 @@ function BellIcon({ className }: { className?: string }) {
         d="M9 18H15"
         stroke="currentColor"
         strokeLinecap="round"
-        strokeWidth="1.8"
+        strokeWidth="2"
       />
       <path
         d="M10.5 21H13.5"
         stroke="currentColor"
         strokeLinecap="round"
-        strokeWidth="1.8"
+        strokeWidth="2"
       />
       <path
         d="M6.75 9.25C6.75 6.35051 9.10051 4 12 4C14.8995 4 17.25 6.35051 17.25 9.25V12.0463C17.25 12.6305 17.4204 13.2019 17.7405 13.6906L18.7447 15.2244C19.2388 15.9792 18.698 17 17.7958 17H6.2042C5.30203 17 4.7612 15.9792 5.25527 15.2244L6.25947 13.6906C6.57958 13.2019 6.75 12.6305 6.75 12.0463V9.25Z"
         stroke="currentColor"
         strokeLinejoin="round"
-        strokeWidth="1.8"
+        strokeWidth="2"
       />
     </svg>
   );
@@ -75,7 +75,7 @@ export function WebNotificationMenu({
         iconOnly ? (
           <>
             <span className="sr-only">Notifications</span>
-            <BellIcon className="h-5 w-5" />
+            <BellIcon className="h-[1.35rem] w-[1.35rem]" />
             <span
               className={`absolute -right-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full border px-1.5 text-[0.65rem] font-semibold leading-5 ${
                 unreadCount > 0
